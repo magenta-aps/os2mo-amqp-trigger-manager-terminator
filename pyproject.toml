@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "os2mo-amqp-trigger-manager-terminator"
+version = "0.0.0"  # versioning handled by conventional commits
+description = "An AMQP trigger system for terminating manager positions when managers' engagement has ended"
+authors = ["Magenta ApS"]
+license = "SPDX-FileCopyrightText: Magenta ApS SPDX-License-Identifier: MPL-2.0"
+readme = "README.md"
+packages = [{include = "os2mo_amqp_trigger_manager_terminator"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pytest-split = "^0.8.1"
+pytest-asyncio = "^0.21.0"
+pytest-cov = "^4.1.0"
+fastramqpi = "^1.4.3"
+uvicorn = "^0.22.0"
+pytest = "^7.4.0"
+pydantic = "1.10.5"
+raclients = "^3.1.12"
+gql = "^3.4.1"
+pre-commit = "^3.3.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
