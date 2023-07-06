@@ -15,7 +15,8 @@ variables:
   RELEASE_REGISTRY: docker.io
   RELEASE_REGISTRY_IMAGE: index.docker.io/magentaaps/os2mo-amqp-trigger-manager-terminator
 
-  PYTEST_COV_MODULE: job_function_configurator
+  PYTEST_COV_MODULE: manager_terminator
+
   PYTEST_COV_FAIL_UNDER: 0
 
   PRECOMMIT_USE_POETRY: "true"
