@@ -16,7 +16,6 @@ variables:
   RELEASE_REGISTRY_IMAGE: index.docker.io/magentaaps/os2mo-amqp-trigger-manager-terminator
 
   PYTEST_COV_MODULE: manager_terminator
-
   PYTEST_COV_FAIL_UNDER: 0
 
   PRECOMMIT_USE_POETRY: "true"
@@ -48,7 +47,7 @@ workflow:
 
 
 include:
-  - project: 'labs/salt-automation'
+  - project: labs/salt-automation
     file:
     - gitlab-ci-templates/common/config-updater-flux.v1.yml
     - gitlab-ci-templates/common/config-updater-meta.v1.yml
