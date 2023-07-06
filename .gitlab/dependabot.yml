@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2022 Magenta ApS <https://magenta.dk>
+# SPDX-License-Identifier: MPL-2.0
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: daily
+    auto-merge: true
+    rebase-strategy: all
+    open-pull-requests-limit: 100
