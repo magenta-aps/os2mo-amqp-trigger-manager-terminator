@@ -19,11 +19,10 @@ variables:
   PYTEST_COV_FAIL_UNDER: 0
 
   PRECOMMIT_USE_POETRY: "true"
-  POETRY_VERSION: "1.5.0"
+  POETRY_VERSION: "1.5.1"
 
   PRODUCT: os2mo
   COMPONENT: manager_terminator
-
 
 
 # Conditions
@@ -50,7 +49,7 @@ include:
   - project: labs/salt-automation
     file:
     - gitlab-ci-templates/common/config-updater-flux.v1.yml
-    - gitlab-ci-templates/common/config-updater-meta.v1.yml
+    - gitlab-ci-templates/common/config-updater-salt.v1.yml
     - gitlab-ci-templates/common/conventional-commits.v1.yml
     - gitlab-ci-templates/common/docker-build-meta.v2.yml
     - gitlab-ci-templates/common/docker-release.v1.yml
