@@ -4,7 +4,7 @@ version: "3.9"
 services:
   terminator:
     build: .
-    command: ["uvicorn", "--factory", "app.main:create_app", "--host", "0.0.0.0", "--reload"]
+    command: ["uvicorn", "--factory", "manager_terminator.main:create_app", "--host", "0.0.0.0", "--reload"]
     env_file:
       - docker.env
     environment:

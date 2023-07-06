@@ -3,8 +3,9 @@
 
 FROM python:3.11
 
+WORKDIR /app
+
 ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     POETRY_VERSION="1.5.1" \
     POETRY_HOME=/opt/poetry \
@@ -16,13 +17,10 @@ RUN python -m venv $POETRY_HOME \
     && pip install --no-cache-dir poetry==${POETRY_VERSION}
 
 # Install project in another isolated environment
-WORKDIR /opt
 RUN python -m venv $VIRTUAL_ENV
-COPY poetry.lock pyproject.toml ./
-RUN poetry install --no-root --only=main
+COPY pyproject.toml poetry.lock* ./
+RUN poetry install --no-root
 
-WORKDIR /opt/app
-COPY manager_terminator .
-WORKDIR /opt/
+COPY . ./
 
-CMD [ "uvicorn", "--factory", "app.main:create_app", "--host", "0.0.0.0" ]
+CMD ["uvicorn", "--factory", "manager_terminator.main:create_app", "--host", "0.0.0.0"]

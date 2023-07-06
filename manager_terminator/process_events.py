@@ -3,23 +3,22 @@
 from uuid import UUID
 
 import structlog
-from raclients.graph.client import PersistentGraphQLClient
+from raclients.graph.client import GraphQLClient
 
-from .config import get_settings
+from manager_terminator.config import get_settings
 
 logger = structlog.get_logger(__name__)
 settings = get_settings()
 
 
 async def process_engagement_events(
-    gql_client: PersistentGraphQLClient, engagement_uuid: UUID
+    gql_client: GraphQLClient, engagement_uuid: UUID
 ) -> None:
     """
-    A function for handling the various events made involving an engagement.
-    This involves checking whether the engagement has an active manager role
-    assigned to it, and whether the manager role includes an end date that
-    matches the engagements' end date.
-    Once the managers end date satisfies our quota, we handle it accordingly.
+    A function for handling the various events made involving a manager.
+    This includes checking whether the persons engagement is active or
+    has been ended, and whether the person assigned as the organisational
+    manager, also has an end date that matches the persons engagements end date.
 
     Args:
         gql_client: A GraphQL client to perform the various queries
@@ -29,8 +28,8 @@ async def process_engagement_events(
     Returns:
         A successful termination of a manager position or None.
     """
-    print("STARTING AN EVENT")
+    print("LISTENING ON AN EVENT")
     logger.info(
-        "Starting event for the engagement with uuid:",
+        "Listening on an engagement event with uuid:",
         engagement_uuid=engagement_uuid,
     )

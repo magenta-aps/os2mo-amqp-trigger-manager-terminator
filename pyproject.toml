@@ -5,7 +5,6 @@ description = "An AMQP trigger system for terminating manager positions when man
 authors = ["Magenta ApS"]
 license = "SPDX-FileCopyrightText: Magenta ApS SPDX-License-Identifier: MPL-2.0"
 readme = "README.md"
-packages = [{include = "os2mo_amqp_trigger_manager_terminator"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"

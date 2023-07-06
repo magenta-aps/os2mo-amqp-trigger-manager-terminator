@@ -33,14 +33,11 @@ repos:
       - id: mypy
         args: [ "--ignore-missing-imports", "--config-file=pyproject.toml" ]
         additional_dependencies:
-          - aiohttp
           - fastapi
           - gql
           - httpx
           - pydantic
           - pytest
-          - starlette_context
-          - strawberry-graphql
           - structlog
 
   - repo: https://github.com/pre-commit/mirrors-prettier

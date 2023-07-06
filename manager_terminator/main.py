@@ -9,9 +9,9 @@ from ramqp.depends import RateLimit
 from ramqp.mo import MORouter
 from ramqp.mo import PayloadUUID
 
-from .config import get_settings
-from .log import setup_logging
-from .process_events import process_engagement_events
+from manager_terminator.config import get_settings
+from manager_terminator.log import setup_logging
+from manager_terminator.process_events import process_engagement_events
 
 amqp_router = MORouter()
 fastapi_router = APIRouter()
@@ -29,9 +29,9 @@ async def listener(context: Context, engagement_uuid: PayloadUUID, _: RateLimit)
     engagement_uuid - UUID of the engagement.
 
     Args:
-    gql_client: A GraphQL client to perform the various queries
+        context: A GraphQL client to perform the various queries
 
-    engagement_uuid: UUID of the engagement
+        engagement_uuid: UUID of the engagement
     """
     gql_session = context["graphql_session"]
     print("!!!!!!!!!", engagement_uuid)
