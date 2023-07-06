@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: 2022 Magenta ApS <https://magenta.dk>
+# SPDX-License-Identifier: MPL-2.0
+version: "3.9"
+services:
+  terminator:
+    build: .
+    command: ["uvicorn", "--factory", "manager_terminator.main:create_app", "--host", "0.0.0.0", "--reload"]
+    env_file:
+      - docker.env
+    environment:
+      LOG_LEVEL: DEBUG
+    networks:
+      - os2mo_default
+    volumes:
+      - ./manager_terminator:/opt/app/
+    ports:
+      - "9000:8000"
+
+networks:
+  os2mo_default:
+    external: true
