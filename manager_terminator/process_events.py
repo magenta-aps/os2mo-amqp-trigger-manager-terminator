@@ -36,6 +36,7 @@ async def process_engagement_events(
     )
     try:  # Make a Graphql query to pull the engagement and its possible objects from MO.
         engagement_objects = await get_engagement_objects(gql_client, engagement_uuid)
+        print("Use this soon, but make mypy happy for now", engagement_objects)
 
     except ValueError as exc:
         print(exc.args[0])
