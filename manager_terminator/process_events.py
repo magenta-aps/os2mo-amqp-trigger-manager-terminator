@@ -6,6 +6,7 @@ import structlog
 from raclients.graph.client import GraphQLClient
 
 from manager_terminator.config import get_settings
+from manager_terminator.queries_made_to_mo import get_engagement_objects
 
 logger = structlog.get_logger(__name__)
 settings = get_settings()
@@ -33,3 +34,9 @@ async def process_engagement_events(
         "Listening on an engagement event with uuid:",
         engagement_uuid=engagement_uuid,
     )
+    try:  # Make a Graphql query to pull the engagement and its possible objects from MO.
+        engagement_objects = await get_engagement_objects(gql_client, engagement_uuid)
+
+    except ValueError as exc:
+        print(exc.args[0])
+        logger.error("Engagement object not found:", exc.args[0])

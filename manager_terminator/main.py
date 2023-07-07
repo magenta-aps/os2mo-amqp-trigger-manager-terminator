@@ -33,11 +33,8 @@ async def listener(context: Context, engagement_uuid: PayloadUUID, _: RateLimit)
 
         engagement_uuid: UUID of the engagement
     """
-    gql_session = context["graphql_session"]
-    print("!!!!!!!!!", engagement_uuid)
-    print("$$$$$$$$$$$$", context)
-    print("@@@@@@@@@@@", gql_session)
-    await process_engagement_events(gql_session, engagement_uuid)
+    graphql_session = context["graphql_session"]
+    await process_engagement_events(graphql_session, engagement_uuid)
 
 
 def create_fastramqpi(**kwargs) -> FastRAMQPI:
