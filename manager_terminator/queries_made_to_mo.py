@@ -9,9 +9,7 @@ from raclients.graph.client import GraphQLClient
 logger = structlog.get_logger()
 
 
-async def get_engagement_objects(
-        gql_client: GraphQLClient, engagement_uuid: UUID
-):
+async def get_engagement_objects(gql_client: GraphQLClient, engagement_uuid: UUID):
     """
     Get the engagement from the event listener and all relevant objects within.
 
