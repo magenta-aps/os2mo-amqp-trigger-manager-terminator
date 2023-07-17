@@ -6,7 +6,7 @@ import structlog
 from gql import gql
 from raclients.graph.client import GraphQLClient
 
-logger = structlog.get_logger()
+logger = structlog.get_logger(__name__)
 
 
 async def get_engagement_objects(gql_client: GraphQLClient, engagement_uuid: UUID):
@@ -36,14 +36,24 @@ async def get_engagement_objects(gql_client: GraphQLClient, engagement_uuid: UUI
                 }
                 employee {
                   uuid
-                  manager_roles {
+                  engagements {
                     uuid
+                    org_unit {
+                      uuid
+                    }
                     validity {
                       from
                       to
                     }
+                  }
+                  manager_roles {
+                    uuid
                     org_unit {
                       uuid
+                    }
+                    validity {
+                      from
+                      to
                     }
                   }
                 }
