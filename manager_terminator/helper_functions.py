@@ -21,9 +21,11 @@ def check_for_end_date(engagement_objects: dict) -> bool:
     return any(
         engagement.get("validity").get("to")
         for engagement in engagement_objects.get("engagements")  # type: ignore
-        if engagement.get("validity").get("to") is not None and
-        engagement.get("org_unit")[0].get("uuid") ==
-        engagement_objects.get("manager_roles")[0].get("org_unit")[0].get("uuid")  # type: ignore
+        if engagement.get("validity").get("to") is not None
+        and engagement.get("org_unit")[0].get("uuid")
+        == engagement_objects.get("manager_roles")[0]  # type: ignore
+        .get("org_unit")[0]
+        .get("uuid")
     )
 
 
@@ -54,25 +56,25 @@ def get_end_date_in_manager_object(engagement_objects: dict) -> str | None:
     for manager in manager_roles:
         # Manager has no end date. Get the manager uuid.
         manager_org_unit_uuid = manager.get("org_unit")[0].get("uuid")
-        if (
-                manager.get("validity").get("to") is None
-                and any(
-            engagement.get("org_unit")[0].get("uuid") == manager_org_unit_uuid for engagement in engagements)
+        if manager.get("validity").get("to") is None and any(
+            engagement.get("org_unit")[0].get("uuid") == manager_org_unit_uuid
+            for engagement in engagements
         ):
             return manager.get("uuid")
 
         # Manager has an end date. Get the manager uuid.
-        if (
-                manager.get("validity").get("to") is not None
-                and any(
-            engagement.get("org_unit")[0].get("uuid") == manager_org_unit_uuid for engagement in engagements)
+        if manager.get("validity").get("to") is not None and any(
+            engagement.get("org_unit")[0].get("uuid") == manager_org_unit_uuid
+            for engagement in engagements
         ):
             return manager.get("uuid")
 
     return None
 
 
-def get_latest_engagement_date_and_check_for_same_org_unit(engagement_objects: dict) -> str | None:
+def get_latest_engagement_date_and_check_for_same_org_unit(
+    engagement_objects: dict,
+) -> str | None:
     """
     Helper function for retrieving the farthest end date of an engagement
     if there is an end date for the engagement, and if the manager role
@@ -105,19 +107,21 @@ def get_latest_engagement_date_and_check_for_same_org_unit(engagement_objects: d
         engagement_org_unit_uuid = engagement.get("org_unit")[0].get("uuid")
 
         # We may assume this is always present, or we would have hit an earlier exit of the event.
-        engagement_to_date = datetime.strptime(engagement.get("validity").get("to"), "%Y-%m-%dT%H:%M:%S%z").date()
+        engagement_to_date = datetime.strptime(
+            engagement.get("validity").get("to"), "%Y-%m-%dT%H:%M:%S%z"
+        ).date()
 
         for manager in manager_roles:
             # To ensure we are retrieving the correct manager role in the correct org unit.
             manager_org_unit_uuid = manager.get("org_unit")[0].get("uuid")
             manager_to_date = manager.get("validity").get("to")
 
-            # If this is the correct org unit, and the manager role either does not have an end date, or the
-            # manager role end date exceeds the engagements end date.
-            if (
-                    manager_org_unit_uuid == engagement_org_unit_uuid
-                    and (manager_to_date is None or engagement_to_date < datetime.strptime(manager_to_date,
-                                                                                           "%Y-%m-%dT%H:%M:%S%z").date())
+            # If this is the correct org unit, and the manager role either does not have an end date,
+            # or the manager role end date exceeds the engagements end date.
+            if manager_org_unit_uuid == engagement_org_unit_uuid and (
+                manager_to_date is None
+                or engagement_to_date
+                < datetime.strptime(manager_to_date, "%Y-%m-%dT%H:%M:%S%z").date()
             ):  # Set the farthest date to the engagements end date.
                 farthest_date = engagement_to_date
 
