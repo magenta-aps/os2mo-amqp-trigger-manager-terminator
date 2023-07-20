@@ -18,18 +18,20 @@ def check_for_end_date(engagement_objects: dict) -> bool:
     Example:
         "True"
     """
+    engagements_org_unit_uuid = engagement_objects["org_unit"][0]["uuid"]
+    engagements = engagement_objects.get("employee")[0].get("engagements")
+
     return any(
         engagement.get("validity").get("to")
-        for engagement in engagement_objects.get("engagements")  # type: ignore
+        for engagement in engagements
         if engagement.get("validity").get("to") is not None
-        and engagement.get("org_unit")[0].get("uuid")
-        == engagement_objects.get("manager_roles")[0]  # type: ignore
-        .get("org_unit")[0]
-        .get("uuid")
+        and engagement.get("org_unit")[0].get("uuid") == engagements_org_unit_uuid
     )
 
 
-def get_end_date_in_manager_object(engagement_objects: dict) -> str | None:
+def get_manager_uuid_if_engagement_is_in_same_org_unit(
+    engagement_objects: dict,
+) -> str | None:
     """
     Helper function for checking whether the manager role has an end date or no end date
     in the same org unit as the engagement exists.
@@ -39,57 +41,46 @@ def get_end_date_in_manager_object(engagement_objects: dict) -> str | None:
 
     Returns:
         The managers uuid, either:
-         If the manager role does not have an end date, and
-         is in the same org unit as the engagement that was created/updated/terminated.
+         If the manager role is in the same org unit as the engagement
+         being created/updated/terminated.
 
-         If the manager role does have an end date, and is in
-         the same org unit as the engagement that was created/updated/terminated.
-
-        Or None, if conditions are not met.
+         Or None, if the manager role is not in the same org unit as
+         the engagement being created/updated/terminated.
 
     Example:
         "02be2d6a-e540-4f53-8b09-1fc2589ea98b"
     """
-    manager_roles = engagement_objects.get("manager_roles")
-    engagements = engagement_objects.get("engagements")
-    assert manager_roles and engagements is not None
+    manager_roles = engagement_objects.get("employee")[0].get("manager_roles")
+    engagement_org_unit_uuid = engagement_objects.get("org_unit")[0].get("uuid")
+
     for manager in manager_roles:
-        # Manager has no end date. Get the manager uuid.
         manager_org_unit_uuid = manager.get("org_unit")[0].get("uuid")
-        if manager.get("validity").get("to") is None and any(
-            engagement.get("org_unit")[0].get("uuid") == manager_org_unit_uuid
-            for engagement in engagements
-        ):
+
+        # Checking for a match on engagements org unit uuid and the manager roles org unit uuid.
+        if manager_org_unit_uuid == engagement_org_unit_uuid:
             return manager.get("uuid")
 
-        # Manager has an end date. Get the manager uuid.
-        if manager.get("validity").get("to") is not None and any(
-            engagement.get("org_unit")[0].get("uuid") == manager_org_unit_uuid
-            for engagement in engagements
-        ):
-            return manager.get("uuid")
-
+    # Manager role may not be in same org unit as the engagement.
     return None
 
 
-def get_latest_engagement_date_and_check_for_same_org_unit(
+def set_latest_end_date_and_ensure_same_org_unit(
     engagement_objects: dict,
 ) -> str | None:
     """
-    Helper function for retrieving the farthest end date of an engagement
-    if there is an end date for the engagement, and if the manager role
-    and the engagement exists in the same org unit.
+    Helper function for setting the farthest date to the end date of the
+    engagement, if the manager role and the engagement exists in the same
+    org unit, and if the manager roles end date exceeds that of the engagement.
 
-    If the manager roles end date arrives before the farthest engagement
-    end date, return None.
+    If the manager roles end date arrives before the engagement end date, return None.
 
     Args:
         engagement_objects: A dict of engagement objects.
 
     Returns:
         An engagement end date in string format, if the manager role either
-        does not have an end date, or the manager roles end date exceeds the
-        farthest engagement end date.
+        does not have an end date, or the manager roles end date exceeds that
+        of the engagement.
 
         None, if the manager roles end date arrives before the engagements
         end date.
@@ -97,32 +88,31 @@ def get_latest_engagement_date_and_check_for_same_org_unit(
     Example:
         "2023-10-23"
     """
-    engagements = engagement_objects["engagements"]
-    manager_roles = engagement_objects["manager_roles"]
+    engagement_org_unit_uuid = engagement_objects.get("org_unit")[0].get("uuid")
+    manager_roles = engagement_objects.get("employee")[0].get("manager_roles")
+    engagement_end_date = engagement_objects.get("validity").get("to")
+
+    assert engagement_org_unit_uuid and manager_roles is not None
+
+    # We may assume this is always present, or we would have hit an earlier exit of the event.
+    engagement_end_date_parsed = datetime.strptime(
+        engagement_end_date, "%Y-%m-%dT%H:%M:%S%z"
+    ).date()
 
     farthest_date = None
 
-    for engagement in engagements:
-        # To ensure we are retrieving the correct engagement in the correct org unit.
-        engagement_org_unit_uuid = engagement.get("org_unit")[0].get("uuid")
+    for manager in manager_roles:
+        # To ensure we are retrieving the correct manager role in the correct org unit.
+        manager_org_unit_uuid = manager.get("org_unit")[0].get("uuid")
+        manager_end_date = manager.get("validity").get("to")
 
-        # We may assume this is always present, or we would have hit an earlier exit of the event.
-        engagement_to_date = datetime.strptime(
-            engagement.get("validity").get("to"), "%Y-%m-%dT%H:%M:%S%z"
-        ).date()
-
-        for manager in manager_roles:
-            # To ensure we are retrieving the correct manager role in the correct org unit.
-            manager_org_unit_uuid = manager.get("org_unit")[0].get("uuid")
-            manager_to_date = manager.get("validity").get("to")
-
-            # If this is the correct org unit, and the manager role either does not have an end date,
-            # or the manager role end date exceeds the engagements end date.
-            if manager_org_unit_uuid == engagement_org_unit_uuid and (
-                manager_to_date is None
-                or engagement_to_date
-                < datetime.strptime(manager_to_date, "%Y-%m-%dT%H:%M:%S%z").date()
-            ):  # Set the farthest date to the engagements end date.
-                farthest_date = engagement_to_date
+        # If this is the correct org unit, and the manager role either does not have an end date,
+        # or the manager role end date exceeds the engagements end date.
+        if manager_org_unit_uuid == engagement_org_unit_uuid and (
+            manager_end_date is None
+            or engagement_end_date_parsed
+            < datetime.strptime(manager_end_date, "%Y-%m-%dT%H:%M:%S%z").date()
+        ):  # Set the farthest date to the engagements end date.
+            farthest_date = engagement_end_date_parsed
 
     return farthest_date.strftime("%Y-%m-%d") if farthest_date else None

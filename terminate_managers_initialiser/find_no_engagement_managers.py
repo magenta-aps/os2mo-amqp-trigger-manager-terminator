@@ -1,6 +1,8 @@
 # SPDX-FileCopyrightText: 2022 Magenta ApS <https://magenta.dk>
 # SPDX-License-Identifier: MPL-2.0
-def extract_managers_with_no_persons_or_engagements(manager_objects: list) -> list | None:
+def extract_managers_with_no_persons_or_engagements(
+    manager_objects: list,
+) -> list | None:
     """
     Function for pulling UUID(s) out on all manager roles, that either does
     not have a person, or an engagement associated to it.
@@ -19,9 +21,8 @@ def extract_managers_with_no_persons_or_engagements(manager_objects: list) -> li
     """
     manager_uuids = [
         manager["objects"][0]["uuid"]
-        for manager in manager_objects if
-        manager["objects"][0]["employee"] is None or
-        len(manager["objects"][0]["employee"][0]["engagements"]) == 0
-        and manager["objects"][0]["validity"]["to"] is None
+        for manager in manager_objects
+        if manager["objects"][0]["employee"] is None
+        or len(manager["objects"][0]["employee"][0]["engagements"]) == 0
     ]
-    return manager_uuids if manager_uuids else None
+    return manager_uuids or None

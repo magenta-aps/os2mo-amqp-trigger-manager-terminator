@@ -2,12 +2,13 @@
 # SPDX-License-Identifier: MPL-2.0
 import datetime
 
-
 from gql import gql
 from raclients.graph.client import GraphQLClient
 
 
-async def terminate_existing_empty_manager_roles(gql_client: GraphQLClient, empty_manager_uuids: list):
+async def terminate_existing_empty_manager_roles(
+    gql_client: GraphQLClient, empty_manager_uuids: list
+):
     mutation = gql(
         """
         mutation ($input: ManagerTerminateInput!) {

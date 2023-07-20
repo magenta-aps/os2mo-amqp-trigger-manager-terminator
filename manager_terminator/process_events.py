@@ -5,17 +5,17 @@ from uuid import UUID
 import structlog
 from raclients.graph.client import GraphQLClient
 
-from manager_terminator.config import get_settings
 from manager_terminator.helper_functions import check_for_end_date
-from manager_terminator.helper_functions import get_end_date_in_manager_object
 from manager_terminator.helper_functions import (
-    get_latest_engagement_date_and_check_for_same_org_unit,
+    get_manager_uuid_if_engagement_is_in_same_org_unit,
+)
+from manager_terminator.helper_functions import (
+    set_latest_end_date_and_ensure_same_org_unit,
 )
 from manager_terminator.mutations_made_to_mo import terminate_manager
 from manager_terminator.queries_made_to_mo import get_engagement_objects
 
 logger = structlog.get_logger(__name__)
-settings = get_settings()
 
 
 async def process_engagement_events(
@@ -40,16 +40,13 @@ async def process_engagement_events(
         "Listening on an engagement event with uuid:",
         engagement_uuid=engagement_uuid,
     )
-    engagement_objects = None
+    # engagement_objects = None
     try:  # Make a Graphql query to pull the engagement and its possible objects from MO.
         engagement_objects = await get_engagement_objects(gql_client, engagement_uuid)
 
-    except ValueError as exc:
-        print(exc.args[0])
-        logger.error("Engagement object not found:", exc.args[0])
-
-    # Make Mypy happy.
-    assert engagement_objects is not None
+    except ValueError:
+        logger.error("Engagement object not found.")
+        return
 
     # Person is not a manager, end the process.
     if len(engagement_objects["employee"][0]["manager_roles"]) == 0:
@@ -58,20 +55,22 @@ async def process_engagement_events(
         return
 
     # The engagement does not have an end date, exit event.
-    if not check_for_end_date(engagement_objects["employee"][0]):
+    if not check_for_end_date(engagement_objects):
         print("No end dates found on the persons engagement(s). End event.")
         return
 
     # Check for the managers end date. If the manager is in the same org unit as the engagement,
     # get the managers UUID.
-    manager_uuid = get_end_date_in_manager_object(engagement_objects["employee"][0])
+    manager_uuid = get_manager_uuid_if_engagement_is_in_same_org_unit(
+        engagement_objects
+    )
 
     # If manager role exists in same org unit as the engagement.
     if manager_uuid:
         # Get the farthest engagement end date, to terminate manager role on.
         farthest_engagement_date_retrieved = (
-            get_latest_engagement_date_and_check_for_same_org_unit(
-                engagement_objects["employee"][0],
+            set_latest_end_date_and_ensure_same_org_unit(
+                engagement_objects,
             )
         )
 
@@ -86,11 +85,9 @@ async def process_engagement_events(
             )
             return
 
-        except ValueError as exc:
-            print(exc.args)
+        except ValueError:
             logger.error(
-                "Engagement end date, manager end date or common org unit uuid not found:",
-                exc.args,
+                "Engagement end date, manager end date or common org unit uuid not found."
             )
 
     # Manager is supposedly being terminated before an active engagement ends - do nothing.
