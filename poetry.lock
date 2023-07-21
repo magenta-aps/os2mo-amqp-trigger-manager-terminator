@@ -1031,7 +1031,7 @@ testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "no
 
 [[package]]
 name = "pytest-asyncio"
-version = "0.21.0"
+version = "0.21.1"
 description = "Pytest support for asyncio"
 optional = false
 python-versions = ">=3.7"
