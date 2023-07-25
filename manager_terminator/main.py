@@ -8,15 +8,28 @@ from ramqp.depends import Context
 from ramqp.depends import RateLimit
 from ramqp.mo import MORouter
 from ramqp.mo import PayloadUUID
+from starlette.requests import Request
 
 from manager_terminator.config import get_settings
 from manager_terminator.log import setup_logging
 from manager_terminator.process_events import process_engagement_events
+from terminate_managers_initialiser.initialise_manager_terminator import (
+    terminator_initialiser,
+)
+
 
 amqp_router = MORouter()
 fastapi_router = APIRouter()
 
 logger = structlog.get_logger(__name__)
+
+
+@fastapi_router.get("/initiate/terminator/", status_code=200)
+async def initiate_terminator(request: Request):
+    context = request.app.state.context
+    graphql_session = context["graphql_session"]
+    await terminator_initialiser(graphql_session)
+    return "OK"
 
 
 @amqp_router.register("engagement")
