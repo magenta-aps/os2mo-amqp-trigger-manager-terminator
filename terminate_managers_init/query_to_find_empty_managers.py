@@ -6,10 +6,32 @@ from raclients.graph.client import GraphQLClient
 
 logger = structlog.get_logger(__name__)
 
-
-async def get_empty_managers(gql_client: GraphQLClient) -> list:
+QUERY_GET_MANAGERS = gql(
     """
-    Get empty manager roles.
+    query GetManagers {
+      managers {
+        objects {
+          objects {
+            uuid
+            employee {
+              engagements{
+                uuid
+              }
+            }
+            validity {
+              to
+            }
+          }
+        }
+      }
+    }
+    """
+)
+
+
+async def get_managers(gql_client: GraphQLClient) -> list:
+    """
+    Get manager roles.
 
     Args:
         gql_client: The GraphQL client to perform the query
@@ -32,27 +54,6 @@ async def get_empty_managers(gql_client: GraphQLClient) -> list:
         ]
 
     """
-    query = gql(
-        """
-        query GetEmptyManagers {
-          managers {
-            objects {
-              objects {
-                uuid
-                employee {
-                  engagements{
-                    uuid
-                  }
-                }
-                validity {
-                  to
-                }
-              }
-            }
-          }
-        }
-        """
-    )
-    response = await gql_client.execute(query)
+    response = await gql_client.execute(QUERY_GET_MANAGERS)
 
     return response["managers"]["objects"]
