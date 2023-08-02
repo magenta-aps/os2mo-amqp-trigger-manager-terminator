@@ -1,6 +1,9 @@
 # SPDX-FileCopyrightText: 2022 Magenta ApS <https://magenta.dk>
 # SPDX-License-Identifier: MPL-2.0
 from datetime import datetime
+from uuid import UUID
+
+from more_itertools import one
 
 
 def check_for_end_date(engagement_objects: dict) -> bool:
@@ -12,29 +15,29 @@ def check_for_end_date(engagement_objects: dict) -> bool:
 
 
     Returns:
-        True if the persons engagement has an end date.
-        False if the persons engagement does not have an end date.
+        True if at least one of the persons engagements has an end date.
+        False if none of the persons engagements does not have an end date.
 
     Example:
         "True"
     """
-    engagements_org_unit_uuid = engagement_objects["org_unit"][0]["uuid"]
-    engagements = engagement_objects.get("employee")[0].get("engagements")
+    engagements_org_unit_uuid = one(engagement_objects["org_unit"])["uuid"]
+    engagements = one(engagement_objects.get("employee")).get("engagements")
 
     return any(
         engagement.get("validity").get("to")
         for engagement in engagements
         if engagement.get("validity").get("to") is not None
-        and engagement.get("org_unit")[0].get("uuid") == engagements_org_unit_uuid
+        and one(engagement.get("org_unit")).get("uuid") == engagements_org_unit_uuid
     )
 
 
 def get_manager_uuid_if_engagement_is_in_same_org_unit(
     engagement_objects: dict,
-) -> str | None:
+) -> UUID | None:
     """
-    Helper function for checking whether the manager role has an end date or no end date
-    in the same org unit as the engagement exists.
+    Helper function for checking whether the manager role is in the
+    same org unit as the engagement exists.
 
     Args:
         engagement_objects: A dict of engagement objects.
@@ -50,11 +53,11 @@ def get_manager_uuid_if_engagement_is_in_same_org_unit(
     Example:
         "02be2d6a-e540-4f53-8b09-1fc2589ea98b"
     """
-    manager_roles = engagement_objects.get("employee")[0].get("manager_roles")
-    engagement_org_unit_uuid = engagement_objects.get("org_unit")[0].get("uuid")
+    manager_roles = one(engagement_objects.get("employee")).get("manager_roles")
+    engagement_org_unit_uuid = one(engagement_objects.get("org_unit")).get("uuid")
 
     for manager in manager_roles:
-        manager_org_unit_uuid = manager.get("org_unit")[0].get("uuid")
+        manager_org_unit_uuid = one(manager.get("org_unit")).get("uuid")
 
         # Checking for a match on engagements org unit uuid and the manager roles org unit uuid.
         if manager_org_unit_uuid == engagement_org_unit_uuid:
@@ -64,7 +67,7 @@ def get_manager_uuid_if_engagement_is_in_same_org_unit(
     return None
 
 
-def set_latest_end_date_and_ensure_same_org_unit(
+def get_latest_end_date_and_ensure_same_org_unit(
     engagement_objects: dict,
 ) -> str | None:
     """
@@ -88,8 +91,8 @@ def set_latest_end_date_and_ensure_same_org_unit(
     Example:
         "2023-10-23"
     """
-    engagement_org_unit_uuid = engagement_objects.get("org_unit")[0].get("uuid")
-    manager_roles = engagement_objects.get("employee")[0].get("manager_roles")
+    engagement_org_unit_uuid = one(engagement_objects.get("org_unit")).get("uuid")
+    manager_roles = one(engagement_objects.get("employee")).get("manager_roles")
     engagement_end_date = engagement_objects.get("validity").get("to")
 
     assert engagement_org_unit_uuid and manager_roles is not None
@@ -103,7 +106,7 @@ def set_latest_end_date_and_ensure_same_org_unit(
 
     for manager in manager_roles:
         # To ensure we are retrieving the correct manager role in the correct org unit.
-        manager_org_unit_uuid = manager.get("org_unit")[0].get("uuid")
+        manager_org_unit_uuid = one(manager.get("org_unit")).get("uuid")
         manager_end_date = manager.get("validity").get("to")
 
         # If this is the correct org unit, and the manager role either does not have an end date,

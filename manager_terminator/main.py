@@ -3,6 +3,7 @@
 import structlog
 from fastapi import APIRouter
 from fastapi import FastAPI
+from fastapi import Response
 from fastramqpi.main import FastRAMQPI
 from ramqp.depends import Context
 from ramqp.depends import RateLimit
@@ -13,7 +14,7 @@ from starlette.requests import Request
 from manager_terminator.config import get_settings
 from manager_terminator.log import setup_logging
 from manager_terminator.process_events import process_engagement_events
-from terminate_managers_initialiser.initialise_manager_terminator import (
+from terminate_managers_init.init_manager_terminator import (
     terminator_initialiser,
 )
 
@@ -24,12 +25,12 @@ fastapi_router = APIRouter()
 logger = structlog.get_logger(__name__)
 
 
-@fastapi_router.get("/initiate/terminator/", status_code=200)
-async def initiate_terminator(request: Request):
+@fastapi_router.get("/initiate/terminator/")
+async def initiate_terminator(request: Request, response: Response):
     context = request.app.state.context
     graphql_session = context["graphql_session"]
     await terminator_initialiser(graphql_session)
-    return "OK"
+    return {"status": response.status_code}
 
 
 @amqp_router.register("engagement")

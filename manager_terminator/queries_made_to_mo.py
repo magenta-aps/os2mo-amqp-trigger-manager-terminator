@@ -4,24 +4,14 @@ from uuid import UUID
 
 import structlog
 from gql import gql
+from more_itertools import only
 from raclients.graph.client import GraphQLClient
 
 logger = structlog.get_logger(__name__)
 
 
-async def get_engagement_objects(gql_client: GraphQLClient, engagement_uuid: UUID):
+QUERY_GET_ENGAGEMENT_OBJECTS = gql(
     """
-    Get the engagement from the event listener and all relevant objects within.
-
-    Args:
-        gql_client: The GraphQL client to perform the query.
-        engagement_uuid: UUID of the engagement being edited or created.
-
-    Returns:
-        Engagement object consisting of all relevant information thereof.
-    """
-    query = gql(
-        """
         query GetEngagementObjects($engagement_uuids: [UUID!]) {
           engagements(uuids: $engagement_uuids) {
             objects {
@@ -62,9 +52,23 @@ async def get_engagement_objects(gql_client: GraphQLClient, engagement_uuid: UUI
           }
         }
         """
-    )
+)
+
+
+async def get_engagement_objects(gql_client: GraphQLClient, engagement_uuid: UUID):
+    """
+    Get the engagement from the event listener and all relevant objects within.
+
+    Args:
+        gql_client: The GraphQL client to perform the query.
+        engagement_uuid: UUID of the engagement being created/edited/terminated.
+
+    Returns:
+        Engagement object consisting of all relevant information thereof.
+    """
     response = await gql_client.execute(
-        query, variable_values={"engagement_uuids": str(engagement_uuid)}
+        QUERY_GET_ENGAGEMENT_OBJECTS,
+        variable_values={"engagement_uuids": str(engagement_uuid)},
     )
 
-    return response["engagements"]["objects"][0]["objects"][0]
+    return only(only(response["engagements"]["objects"])["objects"])

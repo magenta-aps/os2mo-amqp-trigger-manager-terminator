@@ -8,6 +8,16 @@ from raclients.graph.client import GraphQLClient
 
 logger = structlog.get_logger(__name__)
 
+MUTATION_TERMINATE_MANAGER = gql(
+    """
+    mutation ($input: ManagerTerminateInput!) {
+      manager_terminate(input: $input) {
+        uuid
+      }
+    }
+    """
+)
+
 
 async def terminate_manager(
     gql_client: GraphQLClient, manager_uuid: UUID, termination_date: str
@@ -23,19 +33,13 @@ async def terminate_manager(
     Returns:
         A successful termination of a manager.
     """
-    mutation = gql(
-        """
-        mutation ($input: ManagerTerminateInput!) {
-          manager_terminate(input: $input) {
-            uuid
-          }
-        }
-        """
-    )
+
     termination_variables = {
         "input": {
             "uuid": str(manager_uuid),
             "to": termination_date,
         }
     }
-    await gql_client.execute(mutation, variable_values=termination_variables)
+    await gql_client.execute(
+        MUTATION_TERMINATE_MANAGER, variable_values=termination_variables
+    )
