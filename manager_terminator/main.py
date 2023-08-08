@@ -10,6 +10,8 @@ from ramqp.depends import RateLimit
 from ramqp.mo import MORouter
 from ramqp.mo import PayloadUUID
 from starlette.requests import Request
+from starlette.status import HTTP_204_NO_CONTENT
+from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
 from manager_terminator.config import get_settings
 from manager_terminator.log import setup_logging
@@ -25,12 +27,16 @@ fastapi_router = APIRouter()
 logger = structlog.get_logger(__name__)
 
 
-@fastapi_router.get("/initiate/terminator/")
+@fastapi_router.post("/initiate/terminator/", status_code=HTTP_204_NO_CONTENT)
 async def initiate_terminator(request: Request, response: Response):
     context = request.app.state.context
     graphql_session = context["graphql_session"]
-    await terminator_initialiser(graphql_session)
-    return {"status": response.status_code}
+    try:
+        await terminator_initialiser(graphql_session)
+    except Exception as exc:
+        logger.error("An error occured: ", exc.args)
+        response.status_code = HTTP_500_INTERNAL_SERVER_ERROR
+        return {"status": response.status_code}
 
 
 @amqp_router.register("engagement")
