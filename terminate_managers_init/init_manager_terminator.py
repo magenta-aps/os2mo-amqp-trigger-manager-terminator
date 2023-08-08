@@ -16,7 +16,7 @@ from terminate_managers_init.query_to_find_empty_managers import (
 logger = structlog.get_logger(__name__)
 
 
-async def terminator_initialiser(gql_client: GraphQLClient):
+async def terminator_initialiser(gql_client: GraphQLClient) -> None:
     """
     Function that will look for any empty manager roles - if any are found,
     they will be terminated.
