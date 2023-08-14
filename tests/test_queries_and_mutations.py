@@ -276,30 +276,37 @@ MANAGER_OBJECTS = [
         "objects": [
             {
                 "uuid": "0b51953c-537b-4bf9-a872-2710b0ddd9e3",
+                "org_unit": [{"uuid": "13f3cebf-2625-564a-bcfc-31272eb9bce2"}],
                 "employee": [
-                    {"engagements": [{"uuid": "ef9f76fd-1840-4d94-961a-1140c86efd00"}]}
+                    {
+                        "engagements": [
+                            {
+                                "uuid": "ef9f76fd-1840-4d94-961a-1140c86efd00",
+                                "org_unit": [
+                                    {"uuid": "13f3cebf-2625-564a-bcfc-31272eb9bce2"}
+                                ],
+                                "validity": {
+                                    "from": "1975-12-08T00:00:00+01:00",
+                                    "to": None,
+                                },
+                            }
+                        ]
+                    }
                 ],
-                "validity": {"to": None},
+                "validity": {"from": "1975-12-08T00:00:00+01:00", "to": None},
             }
         ]
     },
     {
         "objects": [
             {
-                "uuid": "d818238d-9958-42cc-9037-187f1475eccf",
-                "employee": [{"engagements": []}],
-                "validity": {"to": "2023-09-30T00:00:00+02:00"},
-            }
-        ]
-    },
-    {
-        "objects": [
-            {
-                "uuid": "21926ae9-5479-469a-97ae-3a996a7b3a01",
-                "employee": [
-                    {"engagements": [{"uuid": "d3da8387-cd27-4fb7-a491-2f6ec992d4db"}]}
-                ],
-                "validity": {"to": "2023-08-23T00:00:00+02:00"},
+                "uuid": "083de7f8-d52f-456d-a351-44075cbc0ca5",
+                "org_unit": [{"uuid": "c9d51723-b777-5878-af66-30626e2f9d66"}],
+                "employee": None,
+                "validity": {
+                    "from": "2023-07-18T00:00:00+02:00",
+                    "to": "2023-07-18T00:00:00+02:00",
+                },
             }
         ]
     },
@@ -310,32 +317,74 @@ NO_EMPTY_MANAGER_OBJECTS = [
         "objects": [
             {
                 "uuid": "0b51953c-537b-4bf9-a872-2710b0ddd9e3",
+                "org_unit": [{"uuid": "13f3cebf-2625-564a-bcfc-31272eb9bce2"}],
                 "employee": [
-                    {"engagements": [{"uuid": "ef9f76fd-1840-4d94-961a-1140c86efd00"}]}
+                    {
+                        "engagements": [
+                            {
+                                "uuid": "ef9f76fd-1840-4d94-961a-1140c86efd00",
+                                "org_unit": [
+                                    {"uuid": "13f3cebf-2625-564a-bcfc-31272eb9bce2"}
+                                ],
+                                "validity": {
+                                    "from": "1975-12-08T00:00:00+01:00",
+                                    "to": None,
+                                },
+                            }
+                        ]
+                    }
                 ],
-                "validity": {"to": None},
+                "validity": {"from": "1975-12-08T00:00:00+01:00", "to": None},
             }
         ]
     },
     {
         "objects": [
             {
-                "uuid": "d818238d-9958-42cc-9037-187f1475eccf",
+                "uuid": "106c048f-cfdc-42b4-a418-d5e40b070451",
+                "org_unit": [{"uuid": "7764d0c7-e776-5f07-8a9d-5ee6f5b717b0"}],
                 "employee": [
-                    {"engagements": [{"uuid": "21926ae9-5479-469a-97ae-3a996a7b3a01"}]}
+                    {
+                        "engagements": [
+                            {
+                                "uuid": "8f1d1aac-285b-4284-ae58-35aaf944b974",
+                                "org_unit": [
+                                    {"uuid": "7764d0c7-e776-5f07-8a9d-5ee6f5b717b0"}
+                                ],
+                                "validity": {
+                                    "from": "1985-11-15T00:00:00+01:00",
+                                    "to": None,
+                                },
+                            }
+                        ]
+                    }
                 ],
-                "validity": {"to": "2023-09-30T00:00:00+02:00"},
+                "validity": {"from": "1985-11-15T00:00:00+01:00", "to": None},
             }
         ]
     },
     {
         "objects": [
             {
-                "uuid": "21926ae9-5479-469a-97ae-3a996a7b3a01",
+                "uuid": "220c2015-1da8-4850-9c0e-78ed4947f540",
+                "org_unit": [{"uuid": "2665d8e0-435b-5bb6-a550-f275692984ef"}],
                 "employee": [
-                    {"engagements": [{"uuid": "d3da8387-cd27-4fb7-a491-2f6ec992d4db"}]}
+                    {
+                        "engagements": [
+                            {
+                                "uuid": "5224902e-eca4-42a8-b379-ca55a7a1fceb",
+                                "org_unit": [
+                                    {"uuid": "2665d8e0-435b-5bb6-a550-f275692984ef"}
+                                ],
+                                "validity": {
+                                    "from": "1986-01-14T00:00:00+01:00",
+                                    "to": None,
+                                },
+                            }
+                        ]
+                    }
                 ],
-                "validity": {"to": "2023-08-23T00:00:00+02:00"},
+                "validity": {"from": "1986-01-14T00:00:00+01:00", "to": None},
             }
         ]
     },
@@ -349,38 +398,39 @@ MANAGER_RESPONSE = {
                 "objects": [
                     {
                         "uuid": "0b51953c-537b-4bf9-a872-2710b0ddd9e3",
+                        "org_unit": [{"uuid": "13f3cebf-2625-564a-bcfc-31272eb9bce2"}],
                         "employee": [
                             {
                                 "engagements": [
-                                    {"uuid": "ef9f76fd-1840-4d94-961a-1140c86efd00"}
+                                    {
+                                        "uuid": "ef9f76fd-1840-4d94-961a-1140c86efd00",
+                                        "org_unit": [
+                                            {
+                                                "uuid": "13f3cebf-2625-564a-bcfc-31272eb9bce2"
+                                            }
+                                        ],
+                                        "validity": {
+                                            "from": "1975-12-08T00:00:00+01:00",
+                                            "to": None,
+                                        },
+                                    }
                                 ]
                             }
                         ],
-                        "validity": {"to": None},
+                        "validity": {"from": "1975-12-08T00:00:00+01:00", "to": None},
                     }
                 ]
             },
             {
                 "objects": [
                     {
-                        "uuid": "d818238d-9958-42cc-9037-187f1475eccf",
-                        "employee": [{"engagements": []}],
-                        "validity": {"to": "2023-09-30T00:00:00+02:00"},
-                    }
-                ]
-            },
-            {
-                "objects": [
-                    {
-                        "uuid": "21926ae9-5479-469a-97ae-3a996a7b3a01",
-                        "employee": [
-                            {
-                                "engagements": [
-                                    {"uuid": "d3da8387-cd27-4fb7-a491-2f6ec992d4db"}
-                                ]
-                            }
-                        ],
-                        "validity": {"to": "2023-08-23T00:00:00+02:00"},
+                        "uuid": "083de7f8-d52f-456d-a351-44075cbc0ca5",
+                        "org_unit": [{"uuid": "c9d51723-b777-5878-af66-30626e2f9d66"}],
+                        "employee": None,
+                        "validity": {
+                            "from": "2023-07-18T00:00:00+02:00",
+                            "to": "2023-07-18T00:00:00+02:00",
+                        },
                     }
                 ]
             },
@@ -481,8 +531,10 @@ async def test_initial_terminate_existing_empty_manager_roles():
 
     mock_execute = AsyncMock()
     mocked_gql_client.execute = mock_execute
-
-    await terminate_existing_empty_manager_roles(mocked_gql_client, manager_uuids)
+    for manager_uuid in manager_uuids:
+        await terminate_existing_empty_manager_roles(
+            mocked_gql_client, manager_uuid, termination_date
+        )
     assert len(mock_execute.call_args_list) == len(manager_uuids)
 
     assert mock_execute.call_args_list[0] == unittest.mock.call(

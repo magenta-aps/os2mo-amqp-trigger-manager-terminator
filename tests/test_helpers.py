@@ -4,10 +4,10 @@ import pytest
 
 from manager_terminator.helper_functions import check_for_end_date
 from manager_terminator.helper_functions import (
-    get_latest_end_date_and_ensure_same_org_unit,
+    get_latest_end_date_from_engagement_objects,
 )
 from manager_terminator.helper_functions import (
-    get_manager_uuid_if_engagement_is_in_same_org_unit,
+    get_manager_uuid_and_manager_end_date_if_in_same_org_unit,
 )
 
 engagement_no_end_date_and_same_org_unit = {
@@ -56,6 +56,55 @@ engagement_with_end_date_and_same_org_unit = {
                         "to": "2023-07-19T00:00:00+02:00",
                     },
                 }
+            ],
+            "manager_roles": [
+                {
+                    "uuid": "fda755b6-565c-4b59-ab90-a4c4527ed405",
+                    "org_unit": [{"uuid": "ed3f6666-2a0b-5449-b388-3df81c082539"}],
+                    "validity": {"from": "2023-07-18T00:00:00+02:00", "to": None},
+                }
+            ],
+        }
+    ],
+}
+
+
+multiple_engagements_with_end_dates = {
+    "org_unit": [
+        {"uuid": "ed3f6666-2a0b-5449-b388-3df81c082539", "name": "IT-Support"}
+    ],
+    "validity": {
+        "from": "2023-07-18T00:00:00+02:00",
+        "to": "2123-07-19T00:00:00+02:00",
+    },
+    "employee": [
+        {
+            "uuid": "a224d057-b6b1-467b-bac5-558923330bc7",
+            "engagements": [
+                {
+                    "uuid": "2944d5c1-054d-419b-a86b-a7127bbc22f5",
+                    "org_unit": [{"uuid": "ed3f6666-2a0b-5449-b388-3df81c082539"}],
+                    "validity": {
+                        "from": "2023-07-18T00:00:00+02:00",
+                        "to": "2030-07-19T00:00:00+02:00",
+                    },
+                },
+                {
+                    "uuid": "00e96933-91e4-42ac-9881-0fe1738b2e59",
+                    "org_unit": [{"uuid": "ed3f6666-2a0b-5449-b388-3df81c082539"}],
+                    "validity": {
+                        "from": "2023-08-10T00:00:00+02:00",
+                        "to": "2031-07-19T00:00:00+02:00",
+                    },
+                },
+                {
+                    "uuid": "026784d5-d938-4191-8869-96c591fed500",
+                    "org_unit": [{"uuid": "ed3f6666-2a0b-5449-b388-3df81c082539"}],
+                    "validity": {
+                        "from": "2023-07-27T00:00:00+02:00",
+                        "to": "2032-07-19T00:00:00+02:00",
+                    },
+                },
             ],
             "manager_roles": [
                 {
@@ -171,11 +220,11 @@ def test_check_for_end_date(test_data, expected_result):
     [
         (
             engagement_no_end_date_and_same_org_unit,
-            "fda755b6-565c-4b59-ab90-a4c4527ed405",
+            ("fda755b6-565c-4b59-ab90-a4c4527ed405", None),
         ),
         (
             multiple_manager_roles_and_earlier_engagement_end_date,
-            "21926ae9-5479-469a-97ae-3a996a7b3a01",
+            ("21926ae9-5479-469a-97ae-3a996a7b3a01", "2024-10-23T00:00:00+02:00"),
         ),
         (engagement_with_end_date_but_not_in_same_org_unit, None),
     ],
@@ -186,23 +235,37 @@ def test_end_date_in_manager_object(test_data, expected_result):
     the same org unit as the engagement being created/updated/terminated.
     Returns the managers uuid, if it exists in the same org unit.
     """
-    result = get_manager_uuid_if_engagement_is_in_same_org_unit(test_data)
+    result = get_manager_uuid_and_manager_end_date_if_in_same_org_unit(test_data)
     assert result == expected_result
 
 
 @pytest.mark.parametrize(
-    "test_data, expected_result",
+    "test_data, manager_end_dates, expected_result",
     [
-        (engagement_with_end_date_and_same_org_unit, "2023-07-19"),
-        (multiple_manager_roles_and_earlier_engagement_end_date, "2024-10-20"),
-        (engagement_with_end_date_but_not_in_same_org_unit, None),
+        (
+            engagement_with_end_date_and_same_org_unit,
+            "2023-09-21T00:00:00+02:00",
+            "2023-07-19",
+        ),
+        (
+            multiple_manager_roles_and_earlier_engagement_end_date,
+            "2222-10-20T00:00:00+02:00",
+            "2023-08-23",
+        ),
+        (
+            multiple_engagements_with_end_dates,
+            "2123-07-19T00:00:00+02:00",
+            "2030-07-19",
+        ),
     ],
 )
-def test_set_latest_end_date_and_ensure_same_org_unit(test_data, expected_result):
+def test_set_latest_end_date_and_ensure_same_org_unit(
+    test_data, manager_end_dates, expected_result
+):
     """
     Tests whether the manager roles end date arrives before the engagements end date.
     Will return a datetime string, if the engagement has an earlier end date.
     Will return None, if the manager roles end date arrives before the engagements.
     """
-    result = get_latest_end_date_and_ensure_same_org_unit(test_data)
+    result = get_latest_end_date_from_engagement_objects(test_data, manager_end_dates)
     assert result == expected_result
