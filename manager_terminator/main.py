@@ -8,15 +8,28 @@ from ramqp.depends import Context
 from ramqp.depends import RateLimit
 from ramqp.mo import MORouter
 from ramqp.mo import PayloadUUID
+from starlette.requests import Request
+from starlette.status import HTTP_204_NO_CONTENT
 
 from manager_terminator.config import get_settings
 from manager_terminator.log import setup_logging
 from manager_terminator.process_events import process_engagement_events
+from terminate_managers_init.init_manager_terminator import (
+    terminator_initialiser,
+)
+
 
 amqp_router = MORouter()
 fastapi_router = APIRouter()
 
 logger = structlog.get_logger(__name__)
+
+
+@fastapi_router.post("/initiate/terminator/", status_code=HTTP_204_NO_CONTENT)
+async def initiate_terminator(request: Request):
+    context = request.app.state.context
+    graphql_session = context["graphql_session"]
+    await terminator_initialiser(graphql_session)
 
 
 @amqp_router.register("engagement")
@@ -33,15 +46,12 @@ async def listener(context: Context, engagement_uuid: PayloadUUID, _: RateLimit)
 
         engagement_uuid: UUID of the engagement
     """
-    gql_session = context["graphql_session"]
-    print("!!!!!!!!!", engagement_uuid)
-    print("$$$$$$$$$$$$", context)
-    print("@@@@@@@@@@@", gql_session)
-    await process_engagement_events(gql_session, engagement_uuid)
+    graphql_session = context["graphql_session"]
+    await process_engagement_events(graphql_session, engagement_uuid)
 
 
 def create_fastramqpi(**kwargs) -> FastRAMQPI:
-    settings = get_settings()
+    settings = get_settings(**kwargs)
     setup_logging(settings.log_level)
 
     fastramqpi = FastRAMQPI(
