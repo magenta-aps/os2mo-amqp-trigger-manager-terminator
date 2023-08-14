@@ -16,7 +16,7 @@ variables:
   RELEASE_REGISTRY_IMAGE: index.docker.io/magentaaps/os2mo-amqp-trigger-manager-terminator
 
   PYTEST_COV_MODULE: manager_terminator
-  PYTEST_COV_FAIL_UNDER: 0
+  PYTEST_COV_FAIL_UNDER: 60
 
   PRECOMMIT_USE_POETRY: "true"
   POETRY_VERSION: "1.5.1"
@@ -51,14 +51,7 @@ include:
     - gitlab-ci-templates/common/config-updater-flux.v1.yml
     - gitlab-ci-templates/common/config-updater-salt.v1.yml
     - gitlab-ci-templates/common/conventional-commits.v1.yml
-    - gitlab-ci-templates/common/docker-build-meta.v2.yml
+    - gitlab-ci-templates/common/docker-build.v1.yml
     - gitlab-ci-templates/common/docker-release.v1.yml
     - gitlab-ci-templates/common/pre-commit.v1.yml
     - gitlab-ci-templates/python/pytest.v1.yml
-
-# Build
-########
-Build:
-  extends: .build-docker
-  variables:
-    BUILD_DOCKER_EXTRA_FLAGS: "--build-arg=COMMIT_SHA=${CI_COMMIT_SHA} --build-arg=COMMIT_TAG=${CI_COMMIT_TAG}"
