@@ -1,16 +1,17 @@
 # SPDX-FileCopyrightText: 2022 Magenta ApS <https://magenta.dk>
 # SPDX-License-Identifier: MPL-2.0
 from unittest.mock import AsyncMock
+from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
 
 from manager_terminator.helper_functions import check_for_end_date
 from manager_terminator.helper_functions import (
-    get_latest_end_date_and_ensure_same_org_unit,
+    get_latest_end_date_from_engagement_objects,
 )
 from manager_terminator.helper_functions import (
-    get_manager_uuid_if_engagement_is_in_same_org_unit,
+    get_manager_uuid_and_manager_end_date_if_in_same_org_unit,
 )
 from manager_terminator.process_events import process_engagement_events
 from tests.test_queries_and_mutations import ENGAGEMENT_OBJECTS
@@ -26,9 +27,12 @@ from tests.test_queries_and_mutations import (
 
 @pytest.mark.asyncio
 @patch("manager_terminator.process_events.terminate_manager")
+@patch("manager_terminator.process_events.get_latest_end_date_from_engagement_objects")
 @patch("manager_terminator.process_events.get_engagement_objects")
 async def test_process_engagements_event_terminate_managers_successfully(
-    mock_get_engagement_objects: AsyncMock, mock_terminate_manager_function: AsyncMock
+    mock_get_engagement_objects: AsyncMock,
+    mock_get_latest_end_date_from_engagement_objects: MagicMock,
+    mock_terminate_manager_function: AsyncMock,
 ):
     """
     Tests if the manager terminates successfully as part of the event.
@@ -38,14 +42,16 @@ async def test_process_engagements_event_terminate_managers_successfully(
     manager_uuid = (
         ENGAGEMENT_OBJECTS.get("employee")[0].get("manager_roles")[0].get("uuid")  # type: ignore
     )
-    termiation_date = "2023-08-23"
+    termination_date = (
+        mock_get_latest_end_date_from_engagement_objects.return_value
+    ) = "2023-08-23"
     mock_get_engagement_objects.return_value = ENGAGEMENT_OBJECTS
 
     await process_engagement_events(
         gql_client=mocked_gql_client, engagement_uuid=engagement_uuid
     )
     mock_terminate_manager_function.assert_awaited_once_with(
-        mocked_gql_client, manager_uuid, termiation_date
+        mocked_gql_client, manager_uuid, termination_date
     )
 
 
@@ -121,11 +127,13 @@ async def test_process_engagements_event_returns_none_when_terminate_managers_no
         "uuid"
     )
 
+    end_date_for_manager = "2023-08-23T00:00:00+02:00"
+
     mock_get_engagement_objects.return_value = (
         MANAGER_ROLE_END_DATE_BEFORE_ENGAGEMENT_END_DATE
     )
-    get_latest_end_date_and_ensure_same_org_unit(
-        MANAGER_ROLE_END_DATE_BEFORE_ENGAGEMENT_END_DATE
+    get_latest_end_date_from_engagement_objects(
+        MANAGER_ROLE_END_DATE_BEFORE_ENGAGEMENT_END_DATE, end_date_for_manager
     )
 
     await process_engagement_events(
@@ -158,7 +166,7 @@ async def test_process_engagements_event_get_manager_uuid_if_eng_in_same_org_ret
         ENGAGEMENT_OBJECTS_NO_MANAGER_ROLE_IN_SAME_ORG_UNIT
     )
 
-    get_manager_uuid_if_engagement_is_in_same_org_unit(
+    get_manager_uuid_and_manager_end_date_if_in_same_org_unit(
         ENGAGEMENT_OBJECTS_NO_MANAGER_ROLE_IN_SAME_ORG_UNIT
     )
 
