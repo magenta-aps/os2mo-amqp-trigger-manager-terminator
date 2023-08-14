@@ -3,6 +3,7 @@
 from unittest.mock import AsyncMock
 from unittest.mock import MagicMock
 from unittest.mock import patch
+from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
@@ -105,7 +106,7 @@ async def test_terminator_initialiser(
         manager_uuid = termination_data.get("uuid")
         termination_date = termination_data.get("termination_date")
         mock_terminate_existing_empty_manager_roles.assert_awaited_once_with(
-            mocked_gql_client, manager_uuid, termination_date
+            mocked_gql_client, UUID(manager_uuid), termination_date
         )
 
     mock_events_logger.info.assert_any_call(
