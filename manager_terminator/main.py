@@ -55,7 +55,7 @@ def create_fastramqpi(**kwargs) -> FastRAMQPI:
     setup_logging(settings.log_level)
 
     fastramqpi = FastRAMQPI(
-        application_name="os2mo-manager-terminator", settings=settings
+        application_name="os2mo-manager-terminator", settings=settings.fastramqpi
     )
 
     amqpsystem = fastramqpi.get_amqpsystem()
