@@ -7,6 +7,7 @@ from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
+from fastramqpi.config import Settings as FastRAMQPISettings  # type: ignore
 
 from manager_terminator.main import create_app
 from manager_terminator.main import initiate_terminator
@@ -19,16 +20,17 @@ from terminate_managers_init.init_manager_terminator import (
 from tests.test_queries_and_mutations import MANAGER_OBJECTS
 from tests.test_queries_and_mutations import NO_EMPTY_MANAGER_OBJECTS
 
-
 mock_settings = MagicMock(
     return_value={"CLIENT_ID": "Foo", "CLIENT_SECRET": "Bar", "AMQP": "Baz"}
 )
 
 CLIENT = TestClient(
     create_app(
-        client_id="foo",
-        client_secret="bar",
-        amqp={"url": "amqp://guest:guest@msg_broker:5672/"},
+        fastramqpi=FastRAMQPISettings(
+            client_id="foo",
+            client_secret="bar",
+            amqp={"url": "amqp://guest:guest@msg_broker:5672/"},
+        )
     )
 )
 
