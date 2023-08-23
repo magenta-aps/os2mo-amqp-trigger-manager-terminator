@@ -39,24 +39,37 @@ async def process_engagement_events(
         engagement_uuid=engagement_uuid,
     )
     # Make a Graphql query to pull the engagement and its possible objects from MO.
-    engagement_objects = await mo.get_engagement_objects(engagement_uuid)
+    engagement_objects_as_models = await mo.get_engagement_objects(engagement_uuid)
+
+    engagement_objects = None
+
+    try:
+        engagement_objects = one(one(engagement_objects_as_models.objects).objects)
+
+    except ValueError:
+        logger.error("Objects could not be found.")
+
+    engagement_org_unit = engagement_objects.org_unit
+    employee_objects = engagement_objects.employee
+
     try:
         # Person is not a manager, end the process.
-        if len(one(engagement_objects["employee"])["manager_roles"]) == 0:
+        if len(one(employee_objects).manager_roles) == 0:
             logger.info("The person is not a manager. Event exited.")
             return
+
     except ValueError:
         logger.error("Could not find manager roles in employee object")
 
     # The engagement does not have an end date, exit event.
-    if not check_for_end_date(engagement_objects):
+    if not check_for_end_date(engagement_org_unit, employee_objects):
         logger.info("No end dates found on the persons engagement(s). End event.")
         return
 
     # Check if the manager is in the same org unit as the engagement,
     # get the managers UUID.
     manager_termination_data = (
-        get_manager_uuid_and_manager_end_date_if_in_same_org_unit(engagement_objects)
+        get_manager_uuid_and_manager_end_date_if_in_same_org_unit(employee_objects, engagement_org_unit)
     )
 
     # Unpack data this way in case of None results, and avoiding "TypeError"
@@ -71,7 +84,7 @@ async def process_engagement_events(
         # Get the farthest engagement end date, to terminate manager role on.
         farthest_engagement_date_retrieved = (
             get_latest_end_date_from_engagement_objects(
-                engagement_objects, manager_end_date
+                employee_objects, manager_end_date
             )
         )
 
