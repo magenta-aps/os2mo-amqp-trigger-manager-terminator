@@ -12,7 +12,7 @@ services:
     networks:
       - os2mo_default
     volumes:
-      - ./manager_terminator:/opt/app/
+      - ./manager_terminator:/app/manager_terminator
     ports:
       - "8000:8000"
 
