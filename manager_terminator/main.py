@@ -27,8 +27,15 @@ logger = structlog.get_logger(__name__)
 
 @fastapi_router.post("/initiate/terminator/", status_code=HTTP_204_NO_CONTENT)
 async def initiate_terminator(mo: depends.GraphQLClient):
-    # context = request.app.state.context
-    # graphql_session = context["graphql_session"]
+    """
+    This function serves as an initiator to be run first upon initiating the main
+    application - the listener.
+    When this functions endpoint has been called, any current manager roles
+    without an active engagement or a person attached to the role, will be terminated.
+
+    Args:
+        mo: A MO client used to perform various queries and mutations in MO.
+    """
     await terminator_initialiser(mo)
 
 
@@ -46,7 +53,6 @@ async def listener(mo: depends.GraphQLClient, engagement_uuid: PayloadUUID, _: R
         mo: A MO client used to perform various queries in MO.
         engagement_uuid: UUID of the engagement
         _: Ratelimit, does not need to be set
-
     """
     await process_engagement_events(mo, engagement_uuid)
 
