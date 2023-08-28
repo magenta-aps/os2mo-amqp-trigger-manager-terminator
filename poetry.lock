@@ -404,13 +404,13 @@ files = [
 
 [[package]]
 name = "fastapi"
-version = "0.101.1"
+version = "0.103.0"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "fastapi-0.101.1-py3-none-any.whl", hash = "sha256:aef5f8676eb1b8389952e1fe734abe20f04b71f6936afcc53b320ba79b686a4b"},
-    {file = "fastapi-0.101.1.tar.gz", hash = "sha256:7b32000d14ca9992f7461117b81e4ef9ff0c07936af641b4fe40e67d5f9d63cb"},
+    {file = "fastapi-0.103.0-py3-none-any.whl", hash = "sha256:61ab72c6c281205dd0cbaccf503e829a37e0be108d965ac223779a8479243665"},
+    {file = "fastapi-0.103.0.tar.gz", hash = "sha256:4166732f5ddf61c33e9fa4664f73780872511e0598d4d5434b1816dc1e6d9421"},
 ]
 
 [package.dependencies]
@@ -423,17 +423,17 @@ all = ["email-validator (>=2.0.0)", "httpx (>=0.23.0)", "itsdangerous (>=1.1.0)"
 
 [[package]]
 name = "fastramqpi"
-version = "1.5.4"
+version = "1.5.5"
 description = "Rammearkitektur AMQP framework (FastAPI + RAMQP)"
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "fastramqpi-1.5.4-py3-none-any.whl", hash = "sha256:4380f1e36aa92beab9b0502c2c4db974d170eb9183b889fe1d6bf286c3a18f35"},
-    {file = "fastramqpi-1.5.4.tar.gz", hash = "sha256:4dcb81d3af140589a5913cbd17e8f8655edcda738904cd6a419c1c10c8ae80b0"},
+    {file = "fastramqpi-1.5.5-py3-none-any.whl", hash = "sha256:6c5a69555c9c25894dd07cafcdcc06b2ba5cedbae1de8419710b925c2484e2ba"},
+    {file = "fastramqpi-1.5.5.tar.gz", hash = "sha256:1987568e0c754683f8ed7d19d08e5b94f338b9dfd2d686b5a3a250a408317dfa"},
 ]
 
 [package.dependencies]
-fastapi = ">=0.93,<1.0"
+fastapi = ">=0.101,<1.0"
 gql = ">=3.4.0,<4.0.0"
 more-itertools = ">=9.1.0,<10.0.0"
 prometheus-fastapi-instrumentator = ">=5.9.1,<7.0.0"
@@ -514,13 +514,13 @@ files = [
 
 [[package]]
 name = "griffe"
-version = "0.34.0"
+version = "0.35.2"
 description = "Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "griffe-0.34.0-py3-none-any.whl", hash = "sha256:d8bca9bd4a0880e7f71dc152de4222171d941a32b5504d77450a71a7908dfc1d"},
-    {file = "griffe-0.34.0.tar.gz", hash = "sha256:48c667ad51a7f756238f798866203aeb8f9fa02d4192e25970f57f813bb37f26"},
+    {file = "griffe-0.35.2-py3-none-any.whl", hash = "sha256:9650d6d0369c22f29f2c1bec9548ddc7f448f8ca38698a5799f92f736824e749"},
+    {file = "griffe-0.35.2.tar.gz", hash = "sha256:84ecfe3df17454993b8dd485201566609ac6706a2eb22e3f402da2a39f9f6b5f"},
 ]
 
 [package.dependencies]
@@ -994,13 +994,13 @@ test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=7.4)", "pytest-co
 
 [[package]]
 name = "pluggy"
-version = "1.2.0"
+version = "1.3.0"
 description = "plugin and hook calling mechanisms for python"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "pluggy-1.2.0-py3-none-any.whl", hash = "sha256:c2fd55a7d7a3863cba1a013e4e2414658b1d07b6bc57b3919e0c63c9abb99849"},
-    {file = "pluggy-1.2.0.tar.gz", hash = "sha256:d12f0c4b579b15f5e054301bb226ee85eeeba08ffec228092f8defbaa3a4c4b3"},
+    {file = "pluggy-1.3.0-py3-none-any.whl", hash = "sha256:d89c696a773f8bd377d18e5ecda92b7a3793cbe66c87060a6fb58c7b6e1061f7"},
+    {file = "pluggy-1.3.0.tar.gz", hash = "sha256:cf61ae8f126ac6f7c451172cf30e3e43d3ca77615509771b3a984a0730651e12"},
 ]
 
 [package.extras]
@@ -1750,4 +1750,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "bc96d6e83e3da6e20b8741a4a988c4bf4e4ad73adfe6a77eb5f74aa68cac716e"
+content-hash = "8943616c551fdb5ce4b96fdacf41aff87d35d6139a1595892b92f3c3cfc3de7a"
