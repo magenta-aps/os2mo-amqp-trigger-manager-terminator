@@ -36,8 +36,8 @@ mutation TerminateManager($termination_date: DateTime!, $uuid: UUID!) {
   }
 }
 
-query GetEngagementObjects($engagement_uuids: UUID!) {
-  engagements(uuids: [$engagement_uuids]) {
+query GetEngagementObjects($engagement_uuid: UUID!) {
+  engagements(uuids: [$engagement_uuid]) {
     objects {
       objects {
         org_unit {
