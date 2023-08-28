@@ -26,7 +26,10 @@ async def terminator_initialiser(mo: GraphQLClient) -> None:
     logger.info(
         "Initialising search for managers with no engagements or persons associated with the role."
     )
-    manager_objects = await mo.get_managers()
+    manager_objects_as_models = await mo.get_managers()
+
+    manager_objects = manager_objects_as_models.objects
+
     # Get the manager roles uuids and the termination dates, if no person or
     # engagements are associated with the manager.
     list_of_manager_uuids_and_termination_dates = (
