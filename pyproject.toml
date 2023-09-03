@@ -17,7 +17,7 @@ pytest = "^7.4.0"
 pydantic = "1.10.12"
 raclients = "^3.1.12"
 gql = "^3.4.1"
-pre-commit = "^3.3.3"
+pre-commit = "^3.4.0"
 
 
 [build-system]
