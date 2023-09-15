@@ -40,6 +40,8 @@ async def process_engagement_events(
     )
     # Make a Graphql query to pull the engagement and its possible objects from MO.
     engagement_objects_as_models = await mo.get_engagement_objects(engagement_uuid)
+    engagement_objects_as_models.objects
+    print("+++++++++++++++++++++++++++++++++++++", engagement_objects_as_models)
 
     engagement_objects = one(one(engagement_objects_as_models.objects).objects)
 

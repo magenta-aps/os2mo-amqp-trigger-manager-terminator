@@ -11,10 +11,10 @@ from fastramqpi.config import Settings as FastRAMQPISettings  # type: ignore
 
 from manager_terminator.main import create_app
 from manager_terminator.main import initiate_terminator
-from terminate_managers_init.find_no_engagement_managers import (
+from manager_terminator.terminate_managers_init.find_no_engagement_managers import (
     extract_managers_with_no_persons_or_engagements,
 )
-from terminate_managers_init.init_manager_terminator import (
+from manager_terminator.terminate_managers_init.init_manager_terminator import (
     terminator_initialiser,
 )
 from tests.test_queries_and_mutations import MANAGER_OBJECTS
@@ -29,7 +29,7 @@ CLIENT = TestClient(
         fastramqpi=FastRAMQPISettings(
             client_id="foo",
             client_secret="bar",
-            amqp={"url": "amqp://guest:guest@msg_broker:5672/"},
+            amqp={"url": "amqp://guest:guest@msg-broker:5672/"}
         )
     )
 )

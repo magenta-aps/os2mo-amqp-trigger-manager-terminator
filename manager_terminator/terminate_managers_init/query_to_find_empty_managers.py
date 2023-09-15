@@ -6,7 +6,7 @@ from raclients.graph.client import GraphQLClient
 
 logger = structlog.get_logger(__name__)
 
-QUERY_GET_MANAGERS = gql(
+QUERY_GET_MANAGERS2 = gql(
     """
     query GetManagers {
       managers(from_date: null, to_date: null) {
