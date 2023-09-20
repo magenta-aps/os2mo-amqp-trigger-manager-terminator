@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2022 Magenta ApS <https://magenta.dk>
+# SPDX-FileCopyrightText: 2023 Magenta ApS <https://magenta.dk>
 # SPDX-License-Identifier: MPL-2.0
 version: "3.9"
 services:
@@ -14,7 +14,12 @@ services:
     volumes:
       - ./manager_terminator:/app/manager_terminator
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
+
+#networks:
+#  default:
+#    external: true
+#    name: os2mo_default
 
 networks:
   os2mo_default:

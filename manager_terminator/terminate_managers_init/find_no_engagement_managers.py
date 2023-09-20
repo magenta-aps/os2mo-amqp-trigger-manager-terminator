@@ -1,5 +1,4 @@
-
-# SPDX-FileCopyrightText: 2022 Magenta ApS <https://magenta.dk>
+# SPDX-FileCopyrightText: 2023 Magenta ApS <https://magenta.dk>
 # SPDX-License-Identifier: MPL-2.0
 import datetime
 from uuid import UUID
@@ -36,9 +35,7 @@ def extract_managers_with_no_persons_or_engagements(
         employee_data = one(manager.objects).employee
 
         # If "employee": None or the "employee": [{"engagements": []}]
-        if employee_data is None or not any(
-            e.engagements for e in employee_data
-        ):
+        if employee_data is None or not any(e.engagements for e in employee_data):
             # Use today, if no person or engagements are found.
             termination_objects.append(
                 {
@@ -60,17 +57,13 @@ def extract_managers_with_no_persons_or_engagements(
                     ) and engagement_validity_to:
                         if (
                             farthest_to_date is None
-                            or engagement_validity_to
-                            > farthest_to_date
+                            or engagement_validity_to > farthest_to_date
                         ):
                             # Assign the engagements end date to the farthest date.
                             farthest_to_date = engagement_validity_to
 
                         termination_objects.append(
-                            {
-                                "uuid": manager_uuid,
-                                "termination_date": farthest_to_date
-                            }
+                            {"uuid": manager_uuid, "termination_date": farthest_to_date}
                         )
 
     return termination_objects

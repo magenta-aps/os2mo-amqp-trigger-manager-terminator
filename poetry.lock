@@ -1377,6 +1377,20 @@ ra-utils = ">=1.12.4,<2.0.0"
 structlog = ">=23.1.0,<24.0.0"
 
 [[package]]
+name = "respx"
+version = "0.20.2"
+description = "A utility for mocking out the Python HTTPX and HTTP Core libraries."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "respx-0.20.2-py2.py3-none-any.whl", hash = "sha256:ab8e1cf6da28a5b2dd883ea617f8130f77f676736e6e9e4a25817ad116a172c9"},
+    {file = "respx-0.20.2.tar.gz", hash = "sha256:07cf4108b1c88b82010f67d3c831dae33a375c7b436e54d87737c7f9f99be643"},
+]
+
+[package.dependencies]
+httpx = ">=0.21.0"
+
+[[package]]
 name = "setuptools"
 version = "68.1.2"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
@@ -1750,4 +1764,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "4d8bb374df8f1a4497f9344652c91d5fc176367d9995e06001eb29b4282e094b"
+content-hash = "b947db4e30d5664b0d9ce93b2ba991f8896df57f8de273b3428200e07303db4d"

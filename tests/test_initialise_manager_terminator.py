@@ -1,45 +1,32 @@
-# SPDX-FileCopyrightText: 2022 Magenta ApS <https://magenta.dk>
+# SPDX-FileCopyrightText: 2023 Magenta ApS <https://magenta.dk>
 # SPDX-License-Identifier: MPL-2.0
 from unittest.mock import AsyncMock
 from unittest.mock import MagicMock
 from unittest.mock import patch
 from uuid import UUID
 
+import httpx
 import pytest
-from fastapi.testclient import TestClient
-from fastramqpi.config import Settings as FastRAMQPISettings  # type: ignore
+import respx
+from httpx import Response
 
-from manager_terminator.main import create_app
 from manager_terminator.main import initiate_terminator
-from terminate_managers_init.find_no_engagement_managers import (
-    extract_managers_with_no_persons_or_engagements,
-)
-from terminate_managers_init.init_manager_terminator import (
+from manager_terminator.terminate_managers_init.init_manager_terminator import (
     terminator_initialiser,
 )
-from tests.test_queries_and_mutations import MANAGER_OBJECTS
-from tests.test_queries_and_mutations import NO_EMPTY_MANAGER_OBJECTS
-
-mock_settings = MagicMock(
-    return_value={"CLIENT_ID": "Foo", "CLIENT_SECRET": "Bar", "AMQP": "Baz"}
-)
-
-CLIENT = TestClient(
-    create_app(
-        fastramqpi=FastRAMQPISettings(
-            client_id="foo",
-            client_secret="bar",
-            amqp={"url": "amqp://guest:guest@msg_broker:5672/"},
-        )
-    )
-)
+from tests.test_data import MANAGER_OBJECTS_FROM_GET_MANAGERS_CALL_NO_ENGAGEMENTS
 
 
 @pytest.mark.asyncio
+@respx.mock
 async def test_post_to_listener():
-    CLIENT.app.state.context = {"graphql_session": AsyncMock()}
-    response = CLIENT.post("/initiate/terminator/")
-    assert response.status_code == 204
+    async with httpx.AsyncClient() as client:
+        route = respx.post("https://fakeapi/initiate/terminator/").mock(
+            return_value=Response(204)
+        )
+        response = await client.post("https://fakeapi/initiate/terminator/")
+        assert route.called
+        assert response.status_code == 204
 
 
 @pytest.mark.asyncio
@@ -55,26 +42,29 @@ async def test_initiate_terminator(mock_terminator_initialiser: AsyncMock):
 
 @pytest.mark.asyncio
 @patch(
-    "terminate_managers_init.init_manager_terminator.terminate_existing_empty_manager_roles"
+    "manager_terminator.terminate_managers_init.init_manager_terminator.extract_managers_with_no_persons_or_engagements"
 )
-@patch("terminate_managers_init.init_manager_terminator.get_managers")
-@patch("terminate_managers_init.init_manager_terminator.logger")
+@patch("manager_terminator.terminate_managers_init.init_manager_terminator.logger")
 async def test_init_when_no_managers_found(
-    mock_events_logger,
-    mock_managers_object: AsyncMock,
-    mock_terminate_existing_empty_manager_roles: AsyncMock,
+    mock_events_logger, mock_extract_managers_with_no_persons_or_engagements: MagicMock
 ):
     """
     Tests if function exits correctly, when no manager uuids are found.
 
     Tests for correct log message and log level.
     """
-    mocked_gql_client = AsyncMock()
-    mock_managers_object.return_value = NO_EMPTY_MANAGER_OBJECTS
+    # ARRANGE
+    mocked_mo_client = AsyncMock()
+    mocked_mo_client.get_managers.return_value = (
+        MANAGER_OBJECTS_FROM_GET_MANAGERS_CALL_NO_ENGAGEMENTS
+    )
+    mock_extract_managers_with_no_persons_or_engagements.return_value = None
 
-    await terminator_initialiser(mocked_gql_client)
+    # ACT
+    await terminator_initialiser(mocked_mo_client)
 
-    mock_terminate_existing_empty_manager_roles.assert_not_awaited()
+    # ASSERT
+    mocked_mo_client.terminate_manager.assert_not_awaited()
 
     mock_events_logger.info.assert_any_call(
         "No manager roles without a person or engagements associated found."
@@ -83,34 +73,42 @@ async def test_init_when_no_managers_found(
 
 @pytest.mark.asyncio
 @patch(
-    "terminate_managers_init.init_manager_terminator.terminate_existing_empty_manager_roles"
+    "manager_terminator.terminate_managers_init.init_manager_terminator.extract_managers_with_no_persons_or_engagements"
 )
-@patch("terminate_managers_init.init_manager_terminator.get_managers")
-@patch("terminate_managers_init.init_manager_terminator.logger")
+@patch("manager_terminator.terminate_managers_init.init_manager_terminator.logger")
 async def test_terminator_initialiser(
     mock_events_logger,
-    mock_managers_object: AsyncMock,
-    mock_terminate_existing_empty_manager_roles: AsyncMock,
+    mock_extract_managers_uuid_and_end_date: MagicMock,
 ):
     """
     Tests if the terminate function is awaited.
 
     Tests for correct log message and log level.
     """
-    mocked_gql_client = AsyncMock()
-    mock_managers_object.return_value = MANAGER_OBJECTS
-    list_of_terminations = extract_managers_with_no_persons_or_engagements(
-        MANAGER_OBJECTS
-    )
+    # ARRANGE
+    mocked_mo_client = AsyncMock()
+    manager_uuid = UUID("0b51953c-537b-4bf9-a872-2710b0ddd9e3")
+    list_of_terminations = [
+        {
+            "uuid": manager_uuid,
+            "termination_date": "2023-09-19",
+        }
+    ]
+    mock_extract_managers_uuid_and_end_date.return_value = list_of_terminations
 
-    await terminator_initialiser(mocked_gql_client)
+    # ACT
+    await terminator_initialiser(mocked_mo_client)
     for termination_data in list_of_terminations:
-        manager_uuid = termination_data.get("uuid")
+        manager_uuid = termination_data.get("uuid")  # type: ignore
         termination_date = termination_data.get("termination_date")
-        mock_terminate_existing_empty_manager_roles.assert_awaited_once_with(
-            mocked_gql_client, UUID(manager_uuid), termination_date
+        await mocked_mo_client.terminate_manager(termination_date, manager_uuid)
+
+        # ASSERT
+        mocked_mo_client.terminate_manager.assert_awaited_with(
+            termination_date, manager_uuid
         )
 
+    # ASSERT
     mock_events_logger.info.assert_any_call(
         "Terminated empty manager(s) with uuid(s):",
         manager_uuids=list_of_terminations,

@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2023 Magenta ApS <https://magenta.dk>
+# SPDX-License-Identifier: MPL-2.0
 [tool.poetry]
 name = "os2mo-amqp-trigger-manager-terminator"
 version = "0.0.0"  # versioning handled by conventional commits
@@ -19,6 +21,7 @@ raclients = "^3.1.12"
 gql = "^3.4.1"
 pre-commit = "^3.3.3"
 ariadne-codegen = {version = "^0.7.1", extras = ["subscriptions"]}
+respx = "^0.20.2"
 
 [tool.ariadne-codegen]
 
