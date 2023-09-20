@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2022 Magenta ApS <https://magenta.dk>
+# SPDX-FileCopyrightText: 2023 Magenta ApS <https://magenta.dk>
 # SPDX-License-Identifier: MPL-2.0
 from unittest.mock import AsyncMock
 from unittest.mock import MagicMock
@@ -20,9 +20,7 @@ async def test_listener(mock_process_engagement_events: AsyncMock):
     engagement_uuid = uuid4()
     mock_graphql_session = MagicMock()
 
-    context = {"graphql_session": mock_graphql_session}
-
-    await listener(context, engagement_uuid, MagicMock())
+    await listener(mock_graphql_session, engagement_uuid, MagicMock())
 
     mock_process_engagement_events.assert_awaited_once_with(
         mock_graphql_session, engagement_uuid

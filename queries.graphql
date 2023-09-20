@@ -1,0 +1,77 @@
+# SPDX-FileCopyrightText: 2023 Magenta ApS <https://magenta.dk>
+# SPDX-License-Identifier: MPL-2.0
+
+query GetManagers {
+  managers(from_date: null, to_date: null) {
+    objects {
+      objects {
+        uuid
+        org_unit {
+          uuid
+        }
+        employee {
+          engagements {
+            uuid
+            org_unit {
+              uuid
+            }
+            validity {
+              from
+              to
+            }
+          }
+        }
+        validity {
+          from
+          to
+        }
+      }
+    }
+  }
+}
+
+mutation TerminateManager($termination_date: DateTime!, $uuid: UUID!) {
+  manager_terminate(input: {to: $termination_date, uuid: $uuid}) {
+    uuid
+  }
+}
+
+query GetEngagementObjects($engagement_uuid: UUID!) {
+  engagements(uuids: [$engagement_uuid]) {
+    objects {
+      objects {
+        org_unit {
+          uuid
+          name
+        }
+        validity {
+          from
+          to
+        }
+        employee {
+          uuid
+          engagements {
+            uuid
+            org_unit {
+              uuid
+            }
+            validity {
+              from
+              to
+            }
+          }
+          manager_roles {
+            uuid
+            org_unit {
+              uuid
+            }
+            validity {
+              from
+              to
+            }
+          }
+        }
+      }
+    }
+  }
+}
