@@ -25,6 +25,22 @@ from tests.test_data import (
 from tests.test_data import ENGAGEMENT_OBJECTS_NO_END_DATE_IN_ENGAGEMENT
 from tests.test_data import ENGAGEMENT_OBJECTS_PERSON_IS_NOT_MANAGER
 from tests.test_data import ENGAGEMENT_ORG_UNIT_OBJECTS
+from tests.test_data import NO_ENGAGEMENT_OBJECTS_FOUND
+
+
+@pytest.mark.asyncio
+@patch("manager_terminator.process_events.logger")
+async def test_process_events_when_no_objects_found_successfully(mock_event_logger):
+    """
+    Tests if the manager terminates successfully as part of the event.
+    """
+    mocked_mo_client = AsyncMock()
+    mocked_mo_client.get_engagement_objects.return_value = NO_ENGAGEMENT_OBJECTS_FOUND
+    engagement_uuid = UUID("fa5e2af6-ae28-4b6b-8895-3b7d39f93d54")
+    await process_engagement_events(mocked_mo_client, engagement_uuid=engagement_uuid)
+    mock_event_logger.info.assert_any_call(
+        "No engagement objects found - event might be a termination. End process."
+    )
 
 
 @pytest.mark.asyncio

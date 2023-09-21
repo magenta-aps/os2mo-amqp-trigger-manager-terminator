@@ -39,6 +39,12 @@ async def process_engagement_events(mo: GraphQLClient, engagement_uuid: UUID) ->
     # Make a Graphql query to pull the engagement and its possible objects from MO.
     engagement_objects_as_models = await mo.get_engagement_objects(engagement_uuid)
 
+    if not engagement_objects_as_models.objects:
+        logger.info(
+            "No engagement objects found - event might be a termination. End process."
+        )
+        return
+
     engagement_objects = one(one(engagement_objects_as_models.objects).objects)
 
     engagement_org_unit = engagement_objects.org_unit
