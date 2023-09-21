@@ -32,7 +32,7 @@ from tests.test_data import NO_ENGAGEMENT_OBJECTS_FOUND
 @patch("manager_terminator.process_events.logger")
 async def test_process_events_when_no_objects_found_successfully(mock_event_logger):
     """
-    Tests if the manager terminates successfully as part of the event.
+    Tests if the process events function exits successfully if no engagement objects was found.
     """
     mocked_mo_client = AsyncMock()
     mocked_mo_client.get_engagement_objects.return_value = NO_ENGAGEMENT_OBJECTS_FOUND
