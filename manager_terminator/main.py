@@ -3,7 +3,6 @@
 import structlog
 from fastapi import APIRouter
 from fastapi import FastAPI
-from fastapi import Response
 from fastramqpi.main import FastRAMQPI
 from ramqp.depends import RateLimit
 from ramqp.mo import MORouter
