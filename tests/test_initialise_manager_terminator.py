@@ -22,11 +22,11 @@ from tests.test_data import MANAGER_OBJECTS_FROM_GET_MANAGERS_CALL_NO_ENGAGEMENT
 async def test_post_to_listener():
     async with httpx.AsyncClient() as client:
         route = respx.post("https://fakeapi/initiate/terminator/").mock(
-            return_value=Response(204)
+            return_value=Response(200)
         )
         response = await client.post("https://fakeapi/initiate/terminator/")
         assert route.called
-        assert response.status_code == 204
+        assert response.status_code == 200
 
 
 @pytest.mark.asyncio
