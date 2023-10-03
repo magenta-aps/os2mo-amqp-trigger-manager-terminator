@@ -26,11 +26,19 @@ TIMEZONE_OFFSET = timedelta(seconds=7200)
 
 
 @pytest.mark.parametrize(
-    "manager_role_end_date,  employee_objects_data, expected_result",
+    "manager_role_end_date,  employee_objects_data, manager_org_unit_uuids, expected_result",
     [
         (  # There is no employee data. Set termination date to today.
             "2030-12-30T00:00:00+02:00",
             None,
+            [
+                GetManagersManagersObjectsObjectsOrgUnit(
+                    uuid=UUID("13f3cebf-2625-564a-bcfc-31272eb9bce2")
+                ),
+                GetManagersManagersObjectsObjectsOrgUnit(
+                    uuid=UUID("6fc9ba6b-ca5b-5e09-a594-40363c45aae0")
+                ),
+            ],
             [
                 {
                     "uuid": UUID("0b51953c-537b-4bf9-a872-2710b0ddd9e3"),
@@ -41,6 +49,17 @@ TIMEZONE_OFFSET = timedelta(seconds=7200)
         (  # There are no engagements associated with the manager. Set termination date to today.
             "2023-07-18T00:00:00+02:00",
             [{"engagements": []}],
+            [
+                GetManagersManagersObjectsObjectsOrgUnit(
+                    uuid=UUID("13f3cebf-2625-564a-bcfc-31272eb9bce2")
+                ),
+                GetManagersManagersObjectsObjectsOrgUnit(
+                    uuid=UUID("3589b521-37b8-5e7f-9c1e-c89e1939e4e5")
+                ),
+                GetManagersManagersObjectsObjectsOrgUnit(
+                    uuid=UUID("fefb46ae-4dde-5530-80a8-0be34c7149f2")
+                ),
+            ],
             [
                 {
                     "uuid": UUID("0b51953c-537b-4bf9-a872-2710b0ddd9e3"),
@@ -66,6 +85,11 @@ TIMEZONE_OFFSET = timedelta(seconds=7200)
                         }
                     ]
                 }
+            ],
+            [
+                GetManagersManagersObjectsObjectsOrgUnit(
+                    uuid=UUID("13f3cebf-2625-564a-bcfc-31272eb9bce2")
+                )
             ],
             [
                 {
@@ -96,6 +120,11 @@ TIMEZONE_OFFSET = timedelta(seconds=7200)
                 }
             ],
             [
+                GetManagersManagersObjectsObjectsOrgUnit(
+                    uuid=UUID("13f3cebf-2625-564a-bcfc-31272eb9bce2")
+                )
+            ],
+            [
                 {
                     "uuid": UUID("0b51953c-537b-4bf9-a872-2710b0ddd9e3"),
                     "termination_date": datetime(
@@ -106,6 +135,7 @@ TIMEZONE_OFFSET = timedelta(seconds=7200)
         ),
         (  # Manager end date is farther than several engagements.
             # Set the termination to the farthest engagement date from same org unit.
+            # Multiple manager org unit uuids.
             "2121-12-21T00:00:00+02:00",
             [
                 {
@@ -154,6 +184,17 @@ TIMEZONE_OFFSET = timedelta(seconds=7200)
                 }
             ],
             [
+                GetManagersManagersObjectsObjectsOrgUnit(
+                    uuid=UUID("13f3cebf-2625-564a-bcfc-31272eb9bce2")
+                ),
+                GetManagersManagersObjectsObjectsOrgUnit(
+                    uuid=UUID("cf4daae1-4812-41f1-8c47-63a99e26aadf")
+                ),
+                GetManagersManagersObjectsObjectsOrgUnit(
+                    uuid=UUID("f06ee470-9f17-566f-acbe-e938112d46d9")
+                ),
+            ],
+            [
                 {
                     "uuid": UUID("0b51953c-537b-4bf9-a872-2710b0ddd9e3"),
                     "termination_date": datetime(
@@ -165,18 +206,24 @@ TIMEZONE_OFFSET = timedelta(seconds=7200)
     ],
 )
 def test_extract_managers_with_no_persons_or_engagements(
-    manager_role_end_date, employee_objects_data, expected_result
+    manager_role_end_date,
+    employee_objects_data,
+    manager_org_unit_uuids,
+    expected_result,
 ):
     test_objects = [
         GetManagersManagersObjects(
             objects=[
                 GetManagersManagersObjectsObjects(
                     uuid=UUID("0b51953c-537b-4bf9-a872-2710b0ddd9e3"),
-                    org_unit=[
-                        GetManagersManagersObjectsObjectsOrgUnit(
-                            uuid=UUID("13f3cebf-2625-564a-bcfc-31272eb9bce2")
-                        )
-                    ],
+                    org_unit=manager_org_unit_uuids,  # [
+                    #     GetManagersManagersObjectsObjectsOrgUnit(
+                    #         uuid=UUID("13f3cebf-2625-564a-bcfc-31272eb9bce2")
+                    #     ),
+                    #     GetManagersManagersObjectsObjectsOrgUnit(
+                    #         uuid=UUID("13f3cebf-2625-564a-bcfc-31272eb9bce2")
+                    #     )
+                    # ],
                     employee=employee_objects_data,
                     validity=GetManagersManagersObjectsObjectsValidity(
                         from_=datetime.fromisoformat("1975-12-08T00:00:00+01:00"),
