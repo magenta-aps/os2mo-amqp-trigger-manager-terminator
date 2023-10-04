@@ -47,28 +47,31 @@ def extract_managers_with_no_persons_or_engagements(
         farthest_to_date = None
 
         if employee_data:
+            # engagement_org_unit_uuid = None
             for employee in employee_data:
-                engagements = employee.engagements
-                for engagement in engagements:
-                    engagement_org_unit_uuid = one(engagement.org_unit).uuid
-                    engagement_validity_to = engagement.validity.to
-                    for manager_org_unit_element in manager_org_unit_list:
-                        manager_org_unit_uuid = manager_org_unit_element.uuid
-                        if (  # If there's a match and engagement has an end date.
-                            engagement_org_unit_uuid == manager_org_unit_uuid
-                        ) and engagement_validity_to:
-                            if (
-                                farthest_to_date is None
-                                or engagement_validity_to > farthest_to_date
-                            ):
-                                # Assign the engagements end date to the farthest date.
-                                farthest_to_date = engagement_validity_to
+                employee_engagements = employee.engagements
+                for employee_engagement in employee_engagements:
+                    engagement_org_unit_list = employee_engagement.org_unit
+                    engagement_validity_to = employee_engagement.validity.to
+                    for engagement_org_unit_element in engagement_org_unit_list:
+                        engagement_org_unit_uuid = engagement_org_unit_element.uuid
+                        for manager_org_unit_element in manager_org_unit_list:
+                            manager_org_unit_uuid = manager_org_unit_element.uuid
+                            if (  # If there's a match and engagement has an end date.
+                                engagement_org_unit_uuid == manager_org_unit_uuid
+                            ) and engagement_validity_to:
+                                if (
+                                    farthest_to_date is None
+                                    or engagement_validity_to > farthest_to_date
+                                ):
+                                    # Assign the engagements end date to the farthest date.
+                                    farthest_to_date = engagement_validity_to
 
-                            termination_objects.append(
-                                {
-                                    "uuid": manager_uuid,
-                                    "termination_date": farthest_to_date,
-                                }
-                            )
+                                termination_objects.append(
+                                    {
+                                        "uuid": manager_uuid,
+                                        "termination_date": farthest_to_date,
+                                    }
+                                )
 
     return termination_objects
