@@ -53,10 +53,10 @@ def extract_managers_with_no_persons_or_engagements(
                 for employee_engagement in employee_engagements:
                     engagement_org_unit_list = employee_engagement.org_unit
                     engagement_validity_to = employee_engagement.validity.to
-                    for engagement_org_unit_element in engagement_org_unit_list:
-                        engagement_org_unit_uuid = engagement_org_unit_element.uuid
-                        for manager_org_unit_element in manager_org_unit_list:
-                            manager_org_unit_uuid = manager_org_unit_element.uuid
+                    for engagement_org_unit in engagement_org_unit_list:
+                        engagement_org_unit_uuid = engagement_org_unit.uuid
+                        for manager_org_unit in manager_org_unit_list:
+                            manager_org_unit_uuid = manager_org_unit.uuid
                             if (  # If there's a match and engagement has an end date.
                                 engagement_org_unit_uuid == manager_org_unit_uuid
                             ) and engagement_validity_to:
