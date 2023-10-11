@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: MPL-2.0
 
 query GetManagers {
-  managers(from_date: null, to_date: null) {
+  managers(filter: {
+    from_date: null, to_date: null
+  }) {
     objects {
       objects {
         uuid
@@ -30,14 +32,14 @@ query GetManagers {
   }
 }
 
-mutation TerminateManager($termination_date: DateTime!, $uuid: UUID!) {
-  manager_terminate(input: {to: $termination_date, uuid: $uuid}) {
+mutation TerminateManager($uuid: UUID!, $termination_date: DateTime!) {
+  manager_terminate(input: {uuid: $uuid, to: $termination_date}) {
     uuid
   }
 }
 
 query GetEngagementObjects($engagement_uuid: UUID!) {
-  engagements(uuids: [$engagement_uuid]) {
+  engagements(filter: {uuids: [$engagement_uuid]}) {
     objects {
       objects {
         org_unit {
