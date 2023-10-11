@@ -46,7 +46,7 @@ async def terminator_initialiser(mo: GraphQLClient) -> None:
         manager_uuid = manager_to_terminate.get("uuid")
         termination_date = manager_to_terminate.get("termination_date")
 
-        await mo.terminate_manager(termination_date, manager_uuid)  # type: ignore
+        await mo.terminate_manager(manager_uuid, termination_date)  # type: ignore
 
     logger.info(
         "Terminated empty manager(s) with uuid(s):",

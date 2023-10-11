@@ -10,7 +10,7 @@ ENV PYTHONUNBUFFERED=1 \
     POETRY_VERSION="1.5.1" \
     POETRY_HOME=/opt/poetry \
     VIRTUAL_ENV="/venv" \
-    FASTRAMQPI__MO_GRAPHQL_VERSION="8"
+    FASTRAMQPI__MO_GRAPHQL_VERSION="17"
 ENV PATH="$VIRTUAL_ENV/bin:$POETRY_HOME/bin:$PATH"
 
 # Install poetry in an isolated environment
