@@ -35,31 +35,26 @@ async def initiate_terminator(mo: depends.GraphQLClient):
         mo: A MO client used to perform various queries and mutations in MO.
     """
 
-    # Get managers & their termination objects
     manager_objects = await managers.get(mo)
-    manager_termination_objects = await managers.termination_objects(manager_objects)
-    if len(manager_termination_objects) < 1:
-        logger.info(
-            "No manager roles without a person or engagements associated found."
-        )
+    manager_invalid_periods = await managers.invalid_manager_periods(manager_objects)
+    if len(manager_invalid_periods) < 1:
+        logger.info("No invalid manager periods found.")
         return
 
-    manager_uuids_terminated = [
-        (
-            await mo.terminate_manager(
-                manager_terminate_obj["uuid"], manager_terminate_obj["termination_date"]
-            )
-        ).uuid  # type: ignore
-        for manager_terminate_obj in manager_termination_objects
-    ]
+    manager_uuids_terminated = []
+    for invalid_manager_period in manager_invalid_periods:
+        terminate_response = await mo.terminate_manager(
+            invalid_manager_period.uuid,
+            invalid_manager_period.from_,
+            invalid_manager_period.to,
+        )
+
+        manager_uuids_terminated.append(terminate_response.uuid)
 
     logger.info(
         "Terminated empty manager(s) with uuid(s):",
         manager_uuids=manager_uuids_terminated,
     )
-
-    # TODO: Remove this when possible
-    # await terminator_initialiser(mo)
 
 
 @amqp_router.register("engagement")
