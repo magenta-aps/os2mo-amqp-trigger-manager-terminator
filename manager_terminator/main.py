@@ -3,6 +3,7 @@
 import structlog
 from fastapi import APIRouter
 from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
 from fastramqpi.main import FastRAMQPI
 from ramqp.depends import RateLimit
 from ramqp.mo import MORouter
@@ -24,7 +25,7 @@ logger = structlog.get_logger(__name__)
 
 
 @fastapi_router.post("/initiate/terminator/", status_code=HTTP_200_OK)
-async def initiate_terminator(mo: depends.GraphQLClient):
+async def initiate_terminator(mo: depends.GraphQLClient, dryrun: bool = False):
     """
     This function serves as an initiator to be run first upon initiating the main
     application - the listener.
@@ -39,6 +40,14 @@ async def initiate_terminator(mo: depends.GraphQLClient):
     manager_invalid_periods = await managers.invalid_manager_periods(manager_objects)
     if len(manager_invalid_periods) < 1:
         logger.info("No invalid manager periods found.")
+        return
+
+    logger.info(
+        "Found invalid manager periods:",
+        manager_invalid_periods=jsonable_encoder(manager_invalid_periods),
+    )
+
+    if dryrun:
         return
 
     manager_uuids_terminated = []
