@@ -65,70 +65,13 @@ async def test_initiate_terminator():
     Tests if the initiate_terminator functions terminator_initialiser
     is called as expected
     """
-    test_data_managers = [
-        _create_test_data_manager_with_employee_engagements(
-            manager_validity=GetManagersManagersObjectsObjectsValidity(
-                from_=datetime.datetime(2023, 1, 1, 0, 0),
-                to=datetime.datetime(2023, 12, 31, 0, 0),
-            ),
-            engagement_validities=[
-                # outside/BEFORE manager validity
-                GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
-                    from_=datetime.datetime(2022, 1, 1, 0, 0),
-                    to=datetime.datetime(2022, 9, 29, 0, 0),
-                ),
-                # starts outside manager validity, but ends inside
-                GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
-                    from_=datetime.datetime(2022, 12, 1, 0, 0),
-                    to=datetime.datetime(2023, 3, 1, 0, 0),
-                ),
-                # completly inside manager validity
-                GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
-                    from_=datetime.datetime(2023, 5, 1, 0, 0),
-                    to=datetime.datetime(2023, 6, 1, 0, 0),
-                ),
-                # starts inside manager validity, but ends outside
-                GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
-                    from_=datetime.datetime(2023, 10, 1, 0, 0),
-                    to=datetime.datetime(2024, 3, 1, 0, 0),
-                ),
-                # outside/AFTER manager validity
-                GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
-                    from_=datetime.datetime(2024, 6, 1, 0, 0), to=None
-                ),
-            ],
-        ),
-        # Test cut of manager validity, if manager validity-from is before engagement validity-from
-        # same goes for manager validity-to and engagement validity-to
-        _create_test_data_manager_with_employee_engagements(
-            manager_validity=GetManagersManagersObjectsObjectsValidity(
-                from_=datetime.datetime(2023, 1, 1, 0, 0),
-                to=datetime.datetime(2023, 12, 31, 0, 0),
-            ),
-            engagement_validities=[
-                GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
-                    from_=datetime.datetime(2023, 2, 1, 0, 0),
-                    to=datetime.datetime(2023, 4, 30, 0, 0),
-                ),
-                GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
-                    from_=datetime.datetime(2023, 6, 1, 0, 0),
-                    to=datetime.datetime(2023, 8, 31, 0, 0),
-                ),
-                GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
-                    from_=datetime.datetime(2023, 10, 1, 0, 0),
-                    to=datetime.datetime(2023, 11, 30, 0, 0),
-                ),
-            ],
-        ),
-    ]
-
     # Mocking
     mo_get_managers_mock = AsyncMock(
-        return_value=GetManagersManagers(objects=test_data_managers)
+        return_value=GetManagersManagers(objects=TEST_DATA_MANAGERS)
     )
     mo_terminate_manager_mock = AsyncMock(
         return_value=TerminateManagerManagerTerminate(
-            uuid=test_data_managers[0].objects[0].uuid
+            uuid=TEST_DATA_MANAGERS[0].objects[0].uuid
         )
     )
 
@@ -144,38 +87,69 @@ async def test_initiate_terminator():
         [
             # First manager
             call(
-                test_data_managers[0].objects[0].uuid,
+                TEST_DATA_MANAGERS[0].objects[0].uuid,
                 datetime.datetime(2023, 3, 2, 0, 0),
                 datetime.datetime(2023, 4, 30, 0, 0),
             ),
             call(
-                test_data_managers[0].objects[0].uuid,
+                TEST_DATA_MANAGERS[0].objects[0].uuid,
                 datetime.datetime(2023, 6, 2, 0, 0),
                 datetime.datetime(2023, 9, 30, 0, 0),
             ),
             # Second manager
             call(
-                test_data_managers[1].objects[0].uuid,
+                TEST_DATA_MANAGERS[1].objects[0].uuid,
                 datetime.datetime(2023, 1, 1, 0, 0),
                 datetime.datetime(2023, 1, 31, 0, 0),
             ),
             call(
-                test_data_managers[1].objects[0].uuid,
+                TEST_DATA_MANAGERS[1].objects[0].uuid,
                 datetime.datetime(2023, 5, 1, 0, 0),
                 datetime.datetime(2023, 5, 31, 0, 0),
             ),
             call(
-                test_data_managers[1].objects[0].uuid,
+                TEST_DATA_MANAGERS[1].objects[0].uuid,
                 datetime.datetime(2023, 9, 1, 0, 0),
                 datetime.datetime(2023, 9, 30, 0, 0),
             ),
             call(
-                test_data_managers[1].objects[0].uuid,
+                TEST_DATA_MANAGERS[1].objects[0].uuid,
                 datetime.datetime(2023, 12, 1, 0, 0),
                 datetime.datetime(2023, 12, 31, 0, 0),
             ),
         ]
     )
+
+
+@pytest.mark.asyncio
+async def test_initiate_terminator_dry_run():
+    # mocking
+    mo_get_managers_mock = AsyncMock(
+        return_value=GetManagersManagers(objects=TEST_DATA_MANAGERS)
+    )
+
+    mo_terminate_manager_mock = AsyncMock(
+        return_value=TerminateManagerManagerTerminate(
+            uuid=TEST_DATA_MANAGERS[0].objects[0].uuid
+        )
+    )
+
+    mo_mock = AsyncMock(
+        get_managers=mo_get_managers_mock,
+        terminate_manager=mo_terminate_manager_mock,
+    )
+
+    mo_mock = AsyncMock(
+        get_managers=mo_get_managers_mock,
+        terminate_manager=mo_terminate_manager_mock,
+    )
+
+    # invoke
+    await initiate_terminator(mo_mock, dryrun=True)
+
+    # asserts
+    mo_get_managers_mock.assert_called_once()
+    mo_terminate_manager_mock.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -290,3 +264,61 @@ def _create_test_data_manager_with_employee_engagements(
             ),
         ]
     )
+
+
+TEST_DATA_MANAGERS = [
+    _create_test_data_manager_with_employee_engagements(
+        manager_validity=GetManagersManagersObjectsObjectsValidity(
+            from_=datetime.datetime(2023, 1, 1, 0, 0),
+            to=datetime.datetime(2023, 12, 31, 0, 0),
+        ),
+        engagement_validities=[
+            # outside/BEFORE manager validity
+            GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
+                from_=datetime.datetime(2022, 1, 1, 0, 0),
+                to=datetime.datetime(2022, 9, 29, 0, 0),
+            ),
+            # starts outside manager validity, but ends inside
+            GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
+                from_=datetime.datetime(2022, 12, 1, 0, 0),
+                to=datetime.datetime(2023, 3, 1, 0, 0),
+            ),
+            # completly inside manager validity
+            GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
+                from_=datetime.datetime(2023, 5, 1, 0, 0),
+                to=datetime.datetime(2023, 6, 1, 0, 0),
+            ),
+            # starts inside manager validity, but ends outside
+            GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
+                from_=datetime.datetime(2023, 10, 1, 0, 0),
+                to=datetime.datetime(2024, 3, 1, 0, 0),
+            ),
+            # outside/AFTER manager validity
+            GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
+                from_=datetime.datetime(2024, 6, 1, 0, 0), to=None
+            ),
+        ],
+    ),
+    # Test cut of manager validity, if manager validity-from is before engagement validity-from
+    # same goes for manager validity-to and engagement validity-to
+    _create_test_data_manager_with_employee_engagements(
+        manager_validity=GetManagersManagersObjectsObjectsValidity(
+            from_=datetime.datetime(2023, 1, 1, 0, 0),
+            to=datetime.datetime(2023, 12, 31, 0, 0),
+        ),
+        engagement_validities=[
+            GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
+                from_=datetime.datetime(2023, 2, 1, 0, 0),
+                to=datetime.datetime(2023, 4, 30, 0, 0),
+            ),
+            GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
+                from_=datetime.datetime(2023, 6, 1, 0, 0),
+                to=datetime.datetime(2023, 8, 31, 0, 0),
+            ),
+            GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
+                from_=datetime.datetime(2023, 10, 1, 0, 0),
+                to=datetime.datetime(2023, 11, 30, 0, 0),
+            ),
+        ],
+    ),
+]
