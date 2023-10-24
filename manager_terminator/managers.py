@@ -75,8 +75,8 @@ async def invalid_manager_periods(
                 ),
                 [
                     engagement
-                    for manager_employee in manager_obj.employee
-                    for engagement in manager_employee.engagements
+                    for manager_employee in manager_obj.employee or []
+                    for engagement in manager_employee.engagements or []
                 ],
             )
 
