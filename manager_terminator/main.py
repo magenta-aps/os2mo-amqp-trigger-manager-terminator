@@ -52,11 +52,14 @@ async def initiate_terminator(mo: depends.GraphQLClient, dryrun: bool = False):
     if dryrun:
         return
 
-    manager_uuids_terminated = await managers.terminate_manager_periods(
+    terminated_invalid_manager_periods = await managers.terminate_manager_periods(
         mo, manager_invalid_periods
     )
 
-    logger.info("Terminated invalid manager periods: %s" % manager_uuids_terminated)
+    logger.info(
+        "Terminated invalid periods for manager(s): %s"
+        % json.dumps(jsonable_encoder(terminated_invalid_manager_periods))
+    )
 
 
 @amqp_router.register("engagement")
