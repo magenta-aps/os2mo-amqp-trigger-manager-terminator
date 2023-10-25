@@ -91,6 +91,22 @@ async def invalid_manager_periods(
     return all_invalid_periods
 
 
+async def terminate_manager_periods(
+    mo: GraphQLClient, periods: list[InvalidManagerPeriod]
+):
+    return [
+        (
+            await mo.terminate_manager(
+                period.uuid, period.from_.date(), period.to.date()
+            )
+        ).uuid
+        for period in periods
+    ]
+
+
+# Helper methods for this module
+
+
 def _find_gaps(
     manager: GetManagersManagersObjectsObjects,
     engagement_validities: list[
