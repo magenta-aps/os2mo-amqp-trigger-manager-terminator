@@ -20,7 +20,7 @@ from manager_terminator.models import InvalidManagerPeriod
 from manager_terminator.utils import POSITIVE_INFINITY
 
 
-logger = structlog.get_logger(__name__)
+logger = structlog.get_logger()
 
 
 async def get(mo: GraphQLClient) -> list[GetManagersManagersObjects]:
