@@ -32,7 +32,7 @@ query GetManagers {
   }
 }
 
-mutation TerminateManager($uuid: UUID!, $terminate_from: DateTime!, $terminate_to: DateTime!) {
+mutation TerminateManager($uuid: UUID!, $terminate_from: DateTime!, $terminate_to: DateTime) {
   manager_terminate(input: {
     uuid: $uuid,
     from: $terminate_from
