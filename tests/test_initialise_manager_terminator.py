@@ -48,18 +48,6 @@ from tests.test_data import MANAGER_OBJECTS_FROM_GET_MANAGERS_CALL_NO_ENGAGEMENT
 
 
 @pytest.mark.asyncio
-@respx.mock
-async def test_post_to_listener():
-    async with httpx.AsyncClient() as client:
-        route = respx.post("https://fakeapi/initiate/terminator/").mock(
-            return_value=Response(200)
-        )
-        response = await client.post("https://fakeapi/initiate/terminator/")
-        assert route.called
-        assert response.status_code == 200
-
-
-@pytest.mark.asyncio
 async def test_initiate_terminator():
     """
     Tests if the initiate_terminator functions terminator_initialiser
@@ -150,6 +138,21 @@ async def test_initiate_terminator_dry_run():
     # asserts
     mo_get_managers_mock.assert_called_once()
     mo_terminate_manager_mock.assert_not_called()
+
+
+# OLD tests belows
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_post_to_listener():
+    async with httpx.AsyncClient() as client:
+        route = respx.post("https://fakeapi/initiate/terminator/").mock(
+            return_value=Response(200)
+        )
+        response = await client.post("https://fakeapi/initiate/terminator/")
+        assert route.called
+        assert response.status_code == 200
 
 
 @pytest.mark.asyncio
