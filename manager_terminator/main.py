@@ -1,5 +1,7 @@
 # SPDX-FileCopyrightText: 2023 Magenta ApS <https://magenta.dk>
 # SPDX-License-Identifier: MPL-2.0
+import json
+
 import structlog
 from fastapi import APIRouter
 from fastapi import FastAPI
@@ -44,26 +46,17 @@ async def initiate_terminator(mo: depends.GraphQLClient, dryrun: bool = False):
 
     logger.info(
         "Found invalid manager periods:",
-        manager_invalid_periods=jsonable_encoder(manager_invalid_periods),
+        manager_invalid_periods=json.dumps(jsonable_encoder(manager_invalid_periods)),
     )
 
     if dryrun:
         return
 
-    manager_uuids_terminated = []
-    for invalid_manager_period in manager_invalid_periods:
-        terminate_response = await mo.terminate_manager(
-            invalid_manager_period.uuid,
-            invalid_manager_period.from_,
-            invalid_manager_period.to,
-        )
-
-        manager_uuids_terminated.append(terminate_response.uuid)
-
-    logger.info(
-        "Terminated empty manager(s) with uuid(s):",
-        manager_uuids=manager_uuids_terminated,
+    manager_uuids_terminated = await managers.terminate_manager_periods(
+        mo, manager_invalid_periods
     )
+
+    logger.info("Terminated invalid manager periods: %s" % manager_uuids_terminated)
 
 
 @amqp_router.register("engagement")
