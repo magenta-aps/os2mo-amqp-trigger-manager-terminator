@@ -103,11 +103,19 @@ async def terminate_manager_periods(
 ) -> list[InvalidManagerPeriod]:
     terminated_manager_periods = []
     for period in periods:
+        terminate_args = {
+            "uuid": period.uuid,
+            "terminate_from": period.from_.date(),
+            "terminate_to": period.to.date(),
+        }
+
+        if period.to is POSITIVE_INFINITY:
+            terminate_args["terminate_from"] = None
+            terminate_args["terminate_to"] = period.from_.date()
+
         try:
             terminated_manager_periods.append(
-                await mo.terminate_manager(
-                    period.uuid, period.from_.date(), period.to.date()
-                )
+                await mo.terminate_manager(**terminate_args)
             )
         except Exception as e:
             logger.error(
