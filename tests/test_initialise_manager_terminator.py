@@ -75,35 +75,35 @@ async def test_initiate_terminator():
         [
             # First manager
             call(
-                TEST_DATA_MANAGERS[0].objects[0].uuid,
-                datetime.date(2023, 3, 2),
-                datetime.date(2023, 4, 30),
+                uuid=TEST_DATA_MANAGERS[0].objects[0].uuid,
+                terminate_from=datetime.date(2023, 3, 2),
+                terminate_to=datetime.date(2023, 4, 30),
             ),
             call(
-                TEST_DATA_MANAGERS[0].objects[0].uuid,
-                datetime.date(2023, 6, 2),
-                datetime.date(2023, 9, 30),
+                uuid=TEST_DATA_MANAGERS[0].objects[0].uuid,
+                terminate_from=datetime.date(2023, 6, 2),
+                terminate_to=datetime.date(2023, 9, 30),
             ),
             # Second manager
             call(
-                TEST_DATA_MANAGERS[1].objects[0].uuid,
-                datetime.date(2023, 1, 1),
-                datetime.date(2023, 1, 31),
+                uuid=TEST_DATA_MANAGERS[1].objects[0].uuid,
+                terminate_from=datetime.date(2023, 1, 1),
+                terminate_to=datetime.date(2023, 1, 31),
             ),
             call(
-                TEST_DATA_MANAGERS[1].objects[0].uuid,
-                datetime.date(2023, 5, 1),
-                datetime.date(2023, 5, 31),
+                uuid=TEST_DATA_MANAGERS[1].objects[0].uuid,
+                terminate_from=datetime.date(2023, 5, 1),
+                terminate_to=datetime.date(2023, 5, 31),
             ),
             call(
-                TEST_DATA_MANAGERS[1].objects[0].uuid,
-                datetime.date(2023, 9, 1),
-                datetime.date(2023, 9, 30),
+                uuid=TEST_DATA_MANAGERS[1].objects[0].uuid,
+                terminate_from=datetime.date(2023, 9, 1),
+                terminate_to=datetime.date(2023, 9, 30),
             ),
             call(
-                TEST_DATA_MANAGERS[1].objects[0].uuid,
-                datetime.date(2023, 12, 1),
-                datetime.date(2023, 12, 31),
+                uuid=TEST_DATA_MANAGERS[1].objects[0].uuid,
+                terminate_from=datetime.date(2023, 12, 1),
+                terminate_to=datetime.date(2023, 12, 31),
             ),
         ]
     )
