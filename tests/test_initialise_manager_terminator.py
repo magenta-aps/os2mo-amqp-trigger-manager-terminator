@@ -193,6 +193,61 @@ async def test_initiate_terminator_tailing_engagements():
     mo_terminate_manager_mock.assert_not_called()
 
 
+@pytest.mark.asyncio
+async def test_initiate_terminator_terminate_entire_infinity_manager():
+    """Verfies a manager with no engagements and no end-date, is terminated correctly
+
+    A manager with an end-date of infinity, is treated differently since our GraphQL
+    termination-mutation does not accept infinity as a valid to-date.
+
+    So instead we need to set from=None and to=manager_validity.from, which the
+    mutator then treats as a termination of the entire manager from the
+    manager_validity.from to infinity.
+
+    NOTE: This is due to how the termination-mutators have been implemented.
+    Ideally the mutator should be fixed so we can set to=None
+    and then always require "from"-date instead of "to"-date.
+    """
+
+    test_data = [
+        _create_test_data_manager_with_employee_engagements(
+            manager_validity=GetManagersManagersObjectsObjectsValidity(
+                from_=datetime.datetime(2023, 1, 1, 0, 0), to=None
+            ),
+            engagement_validities=[],
+        ),
+    ]
+
+    # mocking
+    mo_get_managers_mock = AsyncMock(
+        return_value=GetManagersManagers(objects=test_data)
+    )
+
+    mo_terminate_manager_mock = AsyncMock(
+        return_value=TerminateManagerManagerTerminate(uuid=test_data[0].objects[0].uuid)
+    )
+
+    mo_mock = AsyncMock(
+        get_managers=mo_get_managers_mock,
+        terminate_manager=mo_terminate_manager_mock,
+    )
+
+    # invoke
+    await initiate_terminator(mo_mock)
+
+    # asserts
+    mo_get_managers_mock.assert_called_once()
+    mo_terminate_manager_mock.assert_has_calls(
+        [
+            call(
+                uuid=test_data[0].objects[0].uuid,
+                terminate_from=None,
+                terminate_to=datetime.date(2023, 1, 1),
+            ),
+        ]
+    )
+
+
 # OLD tests belows
 
 
