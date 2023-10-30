@@ -44,6 +44,7 @@ from manager_terminator.main import initiate_terminator
 from manager_terminator.terminate_managers_init.init_manager_terminator import (
     terminator_initialiser,
 )
+from manager_terminator.utils import validity_timezone_aware
 from tests.test_data import MANAGER_OBJECTS_FROM_GET_MANAGERS_CALL_NO_ENGAGEMENTS
 
 
@@ -308,14 +309,14 @@ def _create_test_data_manager_with_employee_engagements(
                             GetManagersManagersObjectsObjectsEmployeeEngagements(
                                 uuid=uuid4(),
                                 org_unit=org_units,
-                                validity=eng_validity,
+                                validity=validity_timezone_aware(eng_validity),
                             )
                             for eng_validity in engagement_validities
                         ],
                     ),
                 ],
                 org_unit=org_units,
-                validity=manager_validity,
+                validity=validity_timezone_aware(manager_validity),
             ),
         ]
     )
