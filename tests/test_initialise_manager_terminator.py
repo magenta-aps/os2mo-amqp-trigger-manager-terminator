@@ -127,11 +127,6 @@ async def test_initiate_terminator_dry_run():
         terminate_manager=mo_terminate_manager_mock,
     )
 
-    mo_mock = AsyncMock(
-        get_managers=mo_get_managers_mock,
-        terminate_manager=mo_terminate_manager_mock,
-    )
-
     # invoke
     await initiate_terminator(mo_mock, dryrun=True)
 
