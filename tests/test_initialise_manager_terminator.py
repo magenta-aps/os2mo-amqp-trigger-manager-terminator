@@ -135,6 +135,63 @@ async def test_initiate_terminator_dry_run():
     mo_terminate_manager_mock.assert_not_called()
 
 
+@pytest.mark.asyncio
+async def test_initiate_terminator_tailing_engagements():
+    """Verifies a manager which engagements tail eachother.
+
+    ex:
+    - manger validity: 2023-05-15 -> infinity
+    - engagement 1 validity: 2023-01-01 -> 2023-05-14
+    - engagement 2 validity: 2023-05-15 -> 2023-07-31
+    - engagement 3 validity: 2023-08-01 -> infinity
+
+    this should not result in a termination of the manager.
+    """
+
+    test_data = [
+        _create_test_data_manager_with_employee_engagements(
+            manager_validity=GetManagersManagersObjectsObjectsValidity(
+                from_=datetime.datetime(2023, 5, 15, 0, 0), to=None
+            ),
+            engagement_validities=[
+                GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
+                    from_=datetime.datetime(2023, 1, 1, 0, 0),
+                    to=datetime.datetime(2023, 5, 14, 0, 0),
+                ),
+                GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
+                    from_=datetime.datetime(2023, 5, 15, 0, 0),
+                    to=datetime.datetime(2023, 7, 31, 0, 0),
+                ),
+                GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
+                    from_=datetime.datetime(2023, 8, 1, 0, 0),
+                    to=None,
+                ),
+            ],
+        ),
+    ]
+
+    # mocking
+    mo_get_managers_mock = AsyncMock(
+        return_value=GetManagersManagers(objects=test_data)
+    )
+
+    mo_terminate_manager_mock = AsyncMock(
+        return_value=TerminateManagerManagerTerminate(uuid=test_data[0].objects[0].uuid)
+    )
+
+    mo_mock = AsyncMock(
+        get_managers=mo_get_managers_mock,
+        terminate_manager=mo_terminate_manager_mock,
+    )
+
+    # invoke
+    await initiate_terminator(mo_mock)
+
+    # asserts
+    mo_get_managers_mock.assert_called_once()
+    mo_terminate_manager_mock.assert_not_called()
+
+
 # OLD tests belows
 
 
