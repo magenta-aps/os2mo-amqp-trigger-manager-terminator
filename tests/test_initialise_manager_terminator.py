@@ -44,6 +44,7 @@ from manager_terminator.main import initiate_terminator
 from manager_terminator.terminate_managers_init.init_manager_terminator import (
     terminator_initialiser,
 )
+from manager_terminator.utils import validity_timezone_aware
 from tests.test_data import MANAGER_OBJECTS_FROM_GET_MANAGERS_CALL_NO_ENGAGEMENTS
 
 
@@ -127,17 +128,124 @@ async def test_initiate_terminator_dry_run():
         terminate_manager=mo_terminate_manager_mock,
     )
 
-    mo_mock = AsyncMock(
-        get_managers=mo_get_managers_mock,
-        terminate_manager=mo_terminate_manager_mock,
-    )
-
     # invoke
     await initiate_terminator(mo_mock, dryrun=True)
 
     # asserts
     mo_get_managers_mock.assert_called_once()
     mo_terminate_manager_mock.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_initiate_terminator_tailing_engagements():
+    """Verifies a manager which engagements tail eachother.
+
+    ex:
+    - manger validity: 2023-05-15 -> infinity
+    - engagement 1 validity: 2023-01-01 -> 2023-05-14
+    - engagement 2 validity: 2023-05-15 -> 2023-07-31
+    - engagement 3 validity: 2023-08-01 -> infinity
+
+    this should not result in a termination of the manager.
+    """
+
+    test_data = [
+        _create_test_data_manager_with_employee_engagements(
+            manager_validity=GetManagersManagersObjectsObjectsValidity(
+                from_=datetime.datetime(2023, 5, 15, 0, 0), to=None
+            ),
+            engagement_validities=[
+                GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
+                    from_=datetime.datetime(2023, 1, 1, 0, 0),
+                    to=datetime.datetime(2023, 5, 14, 0, 0),
+                ),
+                GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
+                    from_=datetime.datetime(2023, 5, 15, 0, 0),
+                    to=datetime.datetime(2023, 7, 31, 0, 0),
+                ),
+                GetManagersManagersObjectsObjectsEmployeeEngagementsValidity(
+                    from_=datetime.datetime(2023, 8, 1, 0, 0),
+                    to=None,
+                ),
+            ],
+        ),
+    ]
+
+    # mocking
+    mo_get_managers_mock = AsyncMock(
+        return_value=GetManagersManagers(objects=test_data)
+    )
+
+    mo_terminate_manager_mock = AsyncMock(
+        return_value=TerminateManagerManagerTerminate(uuid=test_data[0].objects[0].uuid)
+    )
+
+    mo_mock = AsyncMock(
+        get_managers=mo_get_managers_mock,
+        terminate_manager=mo_terminate_manager_mock,
+    )
+
+    # invoke
+    await initiate_terminator(mo_mock)
+
+    # asserts
+    mo_get_managers_mock.assert_called_once()
+    mo_terminate_manager_mock.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_initiate_terminator_terminate_entire_infinity_manager():
+    """Verfies a manager with no engagements and no end-date, is terminated correctly
+
+    A manager with an end-date of infinity, is treated differently since our GraphQL
+    termination-mutation does not accept infinity as a valid to-date.
+
+    So instead we need to set from=None and to=manager_validity.from, which the
+    mutator then treats as a termination of the entire manager from the
+    manager_validity.from to infinity.
+
+    NOTE: This is due to how the termination-mutators have been implemented.
+    Ideally the mutator should be fixed so we can set to=None
+    and then always require "from"-date instead of "to"-date.
+    """
+
+    test_data = [
+        _create_test_data_manager_with_employee_engagements(
+            manager_validity=GetManagersManagersObjectsObjectsValidity(
+                from_=datetime.datetime(2023, 1, 1, 0, 0), to=None
+            ),
+            engagement_validities=[],
+        ),
+    ]
+
+    # mocking
+    mo_get_managers_mock = AsyncMock(
+        return_value=GetManagersManagers(objects=test_data)
+    )
+
+    mo_terminate_manager_mock = AsyncMock(
+        return_value=TerminateManagerManagerTerminate(uuid=test_data[0].objects[0].uuid)
+    )
+
+    mo_mock = AsyncMock(
+        get_managers=mo_get_managers_mock,
+        terminate_manager=mo_terminate_manager_mock,
+    )
+
+    # invoke
+    await initiate_terminator(mo_mock)
+
+    # asserts
+    mo_get_managers_mock.assert_called_once()
+    mo_terminate_manager_mock.assert_has_calls(
+        [
+            call(
+                uuid=test_data[0].objects[0].uuid,
+                terminate_from=None,
+                terminate_to=datetime.date(2023, 1, 1),
+            ),
+        ]
+    )
 
 
 # OLD tests belows
@@ -256,14 +364,14 @@ def _create_test_data_manager_with_employee_engagements(
                             GetManagersManagersObjectsObjectsEmployeeEngagements(
                                 uuid=uuid4(),
                                 org_unit=org_units,
-                                validity=eng_validity,
+                                validity=validity_timezone_aware(eng_validity),
                             )
                             for eng_validity in engagement_validities
                         ],
                     ),
                 ],
                 org_unit=org_units,
-                validity=manager_validity,
+                validity=validity_timezone_aware(manager_validity),
             ),
         ]
     )

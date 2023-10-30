@@ -168,18 +168,24 @@ def _find_gaps(
     for i in range(len(engagement_validities) - 1):
         # If current period has no end date, then there won't be any more gaps
         if engagement_validities[i].to is None:
-            return gaps
+            continue
 
         next_start_date = engagement_validities[i + 1].from_
         current_end_date = engagement_validities[i].to
 
         # Check for a gap
         if current_end_date < next_start_date:
+            invalid_from = current_end_date + datetime.timedelta(days=1)
+            invalid_to = next_start_date - datetime.timedelta(days=1)
+            if invalid_to < invalid_from:
+                # OBS: This occures on tailing-engagements, where the next engagement starts the same day as the previous ends
+                continue
+
             gaps.append(
                 InvalidManagerPeriod(
                     uuid=manager.uuid,
-                    from_=current_end_date + datetime.timedelta(days=1),
-                    to=next_start_date - datetime.timedelta(days=1),
+                    from_=invalid_from,
+                    to=invalid_to,
                 )
             )
 
