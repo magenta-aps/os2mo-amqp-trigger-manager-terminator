@@ -32,7 +32,7 @@ def extract_managers_with_no_persons_or_engagements(
         manager_org_unit_list = one(manager.objects).org_unit
 
         # Managers engagement details
-        employee_data = one(manager.objects).employee
+        employee_data = one(manager.objects).person
 
         # If "employee": None or the "employee": [{"engagements": []}]
         if employee_data is None or not any(e.engagements for e in employee_data):

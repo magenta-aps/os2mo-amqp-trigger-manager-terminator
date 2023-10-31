@@ -11,7 +11,7 @@ query GetManagers {
         org_unit {
           uuid
         }
-        employee {
+        person {
           engagements {
             uuid
             org_unit {
@@ -54,7 +54,7 @@ query GetEngagementObjects($engagement_uuid: UUID!) {
           from
           to
         }
-        employee {
+        person {
           uuid
           engagements {
             uuid
