@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MPL-2.0
 import datetime
 import json
+from uuid import UUID
 
 import structlog
 from fastapi.encoders import jsonable_encoder
@@ -31,6 +32,13 @@ async def get(mo: GraphQLClient) -> list[GetManagersManagersObjects]:
     """
 
     gql_response = await mo.get_managers()
+    return gql_response.objects
+
+
+async def get_by_employee_uuids(
+    mo: GraphQLClient, employee_uuids: list[UUID]
+) -> list[GetManagersManagersObjects]:
+    gql_response = await mo.get_employee_managers(employee_uuids)
     return gql_response.objects
 
 
