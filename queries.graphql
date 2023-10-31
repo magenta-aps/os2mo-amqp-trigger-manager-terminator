@@ -11,7 +11,7 @@ query GetManagers {
         org_unit {
           uuid
         }
-        employee {
+        person {
           engagements {
             uuid
             org_unit {
@@ -54,7 +54,7 @@ query GetEngagementObjects($engagement_uuid: UUID!) {
           from
           to
         }
-        employee {
+        person {
           uuid
           engagements {
             uuid
@@ -76,6 +76,55 @@ query GetEngagementObjects($engagement_uuid: UUID!) {
               to
             }
           }
+        }
+      }
+    }
+  }
+}
+
+query GetEngagementObjectsByUuids($engagement_uuids: [UUID!]!) {
+  engagements(filter: {uuids: $engagement_uuids, from_date: null, to_date: null}) {
+    objects {
+      objects {
+        uuid
+        org_unit {
+          uuid
+        }
+        person {
+          uuid
+        }
+        validity {
+          from
+          to
+        }
+      }
+    }
+  }
+}
+
+query GetEmployeeManagers($employee_uuids: [UUID!]!) {
+  managers(filter: {employees: $employee_uuids, from_date: null, to_date: null}) {
+    objects {
+      objects {
+        uuid
+        org_unit {
+          uuid
+        }
+        person {
+          engagements {
+            uuid
+            org_unit {
+              uuid
+            }
+            validity {
+              from
+              to
+            }
+          }
+        }
+        validity {
+          from
+          to
         }
       }
     }

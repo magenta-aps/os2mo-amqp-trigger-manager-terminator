@@ -48,7 +48,7 @@ async def process_engagement_events(mo: GraphQLClient, engagement_uuid: UUID) ->
     engagement_objects = one(one(engagement_objects_as_models.objects).objects)
 
     engagement_org_unit = engagement_objects.org_unit
-    employee_objects = engagement_objects.employee
+    employee_objects = engagement_objects.person
 
     try:
         # Person is not a manager, end the process.
