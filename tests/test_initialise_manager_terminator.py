@@ -242,7 +242,7 @@ async def test_initiate_terminator_terminate_entire_infinity_manager():
             call(
                 uuid=test_data[0].objects[0].uuid,
                 terminate_from=None,
-                terminate_to=datetime.date(2023, 1, 1),
+                terminate_to=datetime.date(2022, 12, 31),
             ),
         ]
     )
