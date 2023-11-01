@@ -253,6 +253,130 @@ async def test_engagement_event_handler():
     )
 
 
+@pytest.mark.asyncio
+async def test_engagement_event_handler_complex_data():
+    # test data
+    test_data_root_engagement_uuid = uuid.uuid4()
+
+    shared_org_unit_uuid = uuid.uuid4()
+    shared_person_uuid_1 = uuid.uuid4()
+
+    test_data_engagements = [
+        {
+            "uuid": uuid.uuid4(),
+            "org_unit": [{"uuid": shared_org_unit_uuid}],
+            "person": [{"uuid": shared_person_uuid_1}],
+            "validity": {
+                "from": datetime(2023, 1, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": datetime(2023, 11, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+            },
+        },
+        {
+            "uuid": uuid.uuid4(),
+            "org_unit": [{"uuid": shared_org_unit_uuid}],
+            "person": [{"uuid": shared_person_uuid_1}],
+            "validity": {
+                "from": datetime(2023, 9, 25, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": datetime(2023, 9, 25, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+            },
+        },
+        {
+            "uuid": uuid.uuid4(),
+            "org_unit": [{"uuid": shared_org_unit_uuid}],
+            "person": [{"uuid": shared_person_uuid_1}],
+            "validity": {
+                "from": datetime(2023, 9, 26, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": datetime(2023, 11, 17, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+            },
+        },
+        {
+            "uuid": uuid.uuid4(),
+            "org_unit": [{"uuid": shared_org_unit_uuid}],
+            "person": [{"uuid": shared_person_uuid_1}],
+            "validity": {
+                "from": datetime(2023, 11, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": datetime(2023, 11, 30, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+            },
+        },
+    ]
+
+    test_data_managers = [
+        {
+            "uuid": uuid.uuid4(),
+            "org_unit": [{"uuid": shared_org_unit_uuid}],
+            "person": [
+                {
+                    "uuid": shared_person_uuid_1,
+                    "engagements": test_data_engagements,
+                }
+            ],
+            "validity": {
+                "from": datetime(2023, 1, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": None,
+            },
+        },
+    ]
+
+    # mocking
+    get_engagement_objects_by_uuids_mock = AsyncMock(
+        return_value=GetEngagementObjectsByUuidEngagements(
+            objects=[
+                GetEngagementObjectsByUuidEngagementsObjects(
+                    # NOTE: This object is just used to get the person_uuid,
+                    # which is used later on to fetch employee managers
+                    objects=[
+                        {
+                            "uuid": uuid.uuid4(),
+                            "org_unit": [{"uuid": shared_org_unit_uuid}],
+                            "person": [{"uuid": shared_person_uuid_1}],
+                            "validity": {
+                                "from": datetime(2023, 1, 1, 0, 0, 0).replace(
+                                    tzinfo=DEFAULT_TIMEZONE
+                                ),
+                                "to": None,
+                            },
+                        },
+                    ]
+                )
+            ]
+        )
+    )
+
+    get_employee_managers_mock = AsyncMock(
+        return_value=GetEmployeeManagersManagers(
+            objects=[GetEmployeeManagersManagersObjects(objects=test_data_managers)]
+        )
+    )
+
+    terminate_manager_mock = AsyncMock(
+        return_value=TerminateManagerManagerTerminate(
+            uuid=test_data_managers[0]["uuid"]
+        )
+    )
+
+    mo_mock = AsyncMock(
+        get_engagement_objects_by_uuids=get_engagement_objects_by_uuids_mock,
+        get_employee_managers=get_employee_managers_mock,
+        terminate_manager=terminate_manager_mock,
+    )
+
+    # invoke
+    await engagement_event_handler(mo_mock, test_data_root_engagement_uuid, None)
+
+    # asserts
+    get_engagement_objects_by_uuids_mock.assert_called_once()
+    get_employee_managers_mock.assert_has_calls([call([shared_person_uuid_1])])
+    terminate_manager_mock.assert_has_calls(
+        [
+            call(
+                uuid=test_data_managers[0]["uuid"],
+                terminate_from=None,
+                terminate_to=date(2023, 11, 30),
+            ),
+        ]
+    )
+
+
 # OLD tests belows
 
 
