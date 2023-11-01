@@ -119,7 +119,9 @@ async def terminate_manager_periods(
 
         if period.to is POSITIVE_INFINITY:
             terminate_args["terminate_from"] = None
-            terminate_args["terminate_to"] = period.from_.date()
+            terminate_args["terminate_to"] = (
+                period.from_ - datetime.timedelta(days=1)
+            ).date()
 
         try:
             terminated_manager_periods.append(

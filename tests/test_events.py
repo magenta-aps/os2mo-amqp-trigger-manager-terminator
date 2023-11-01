@@ -244,12 +244,10 @@ async def test_engagement_event_handler():
                 terminate_from=date(2023, 1, 1),
                 terminate_to=date(2023, 1, 31),
             ),
-            # FYI: When from=None, to_date is treated the first date the element is NOT VALID from
-            # so in this instance the object is active from "2023-01-01 to 2023-02-28"
             call(
                 uuid=test_data_managers[2]["uuid"],
                 terminate_from=None,
-                terminate_to=date(2023, 3, 1),
+                terminate_to=test_data_engagement_objs[4]["validity"]["to"].date(),
             ),
         ]
     )
