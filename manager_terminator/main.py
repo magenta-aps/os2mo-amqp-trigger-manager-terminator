@@ -73,7 +73,7 @@ async def engagement_event_handler(
     # Get all engagement objects related to the engagement-event
     engagement_objects = await engagements.get_by_uuid(mo, engagement_uuid)
     if len(engagement_objects) < 1:
-        logger.error("No engagement objects found for", engagement_uuid)
+        logger.error("No engagement objects found for", engagement_uuid=engagement_uuid)
         return
 
     # Go through engagments and collect all unique engagement employee-uuids
