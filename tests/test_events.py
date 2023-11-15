@@ -268,7 +268,7 @@ async def test_engagement_event_handler_complex_data():
             "person": [{"uuid": shared_person_uuid_1}],
             "validity": {
                 "from": datetime(2023, 1, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
-                "to": datetime(2023, 11, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": datetime(2023, 9, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
             },
         },
         {
@@ -295,7 +295,7 @@ async def test_engagement_event_handler_complex_data():
             "person": [{"uuid": shared_person_uuid_1}],
             "validity": {
                 "from": datetime(2023, 11, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
-                "to": datetime(2023, 11, 30, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": None,
             },
         },
     ]
@@ -370,8 +370,286 @@ async def test_engagement_event_handler_complex_data():
         [
             call(
                 uuid=test_data_managers[0]["uuid"],
+                terminate_from=(
+                    test_data_engagements[0]["validity"]["to"] + timedelta(days=1)
+                ).date(),
+                terminate_to=(
+                    test_data_engagements[1]["validity"]["from"] - timedelta(days=1)
+                ).date(),
+            ),
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_engagement_event_handler_engagements_across_orgunits():
+    # test data
+    person_uuid_shared = uuid.uuid4()
+    ou_uuid_1 = uuid.uuid4()
+    ou_uuid_2 = uuid.uuid4()
+    ou_uuid_3 = uuid.uuid4()
+
+    test_data_engagements = [
+        {
+            "uuid": uuid.uuid4(),
+            "person": [{"uuid": person_uuid_shared}],
+            "org_unit": [{"uuid": ou_uuid_1}],
+            "validity": {
+                "from": datetime(2023, 1, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": datetime(2023, 1, 15, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+            },
+        },
+        {
+            "uuid": uuid.uuid4(),
+            "person": [{"uuid": person_uuid_shared}],
+            "org_unit": [{"uuid": ou_uuid_2}],
+            "validity": {
+                "from": datetime(2023, 5, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": None,
+            },
+        },
+        {
+            "uuid": uuid.uuid4(),
+            "person": [{"uuid": person_uuid_shared}],
+            "org_unit": [{"uuid": ou_uuid_3}],
+            "validity": {
+                "from": datetime(2023, 4, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": datetime(2023, 7, 10, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+            },
+        },
+        {
+            "uuid": uuid.uuid4(),
+            "person": [{"uuid": person_uuid_shared}],
+            "org_unit": [{"uuid": ou_uuid_3}],
+            "validity": {
+                "from": datetime(2023, 9, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": datetime(2023, 12, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+            },
+        },
+    ]
+
+    test_data_managers = [
+        {
+            "uuid": uuid.uuid4(),
+            "org_unit": [{"uuid": ou_uuid_3}],
+            "person": [
+                {
+                    "uuid": person_uuid_shared,
+                    "engagements": test_data_engagements,
+                }
+            ],
+            "validity": {
+                "from": datetime(2023, 1, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": None,
+            },
+        },
+    ]
+
+    test_data_event_engagement_uuid = uuid.uuid4()
+
+    # mocking
+    get_engagement_objects_by_uuids_mock = AsyncMock(
+        return_value=GetEngagementObjectsByUuidEngagements(
+            objects=[
+                GetEngagementObjectsByUuidEngagementsObjects(
+                    # NOTE: This object is just used to get the person_uuid,
+                    # which is used later on to fetch employee managers
+                    objects=[
+                        {
+                            "uuid": uuid.uuid4(),
+                            "person": [{"uuid": person_uuid_shared}],
+                            "org_unit": [{"uuid": ou_uuid_1}],
+                            "validity": {
+                                "from": datetime(2023, 1, 1, 0, 0, 0).replace(
+                                    tzinfo=DEFAULT_TIMEZONE
+                                ),
+                                "to": None,
+                            },
+                        },
+                    ]
+                )
+            ]
+        )
+    )
+
+    get_employee_managers_mock = AsyncMock(
+        return_value=GetEmployeeManagersManagers(
+            objects=[GetEmployeeManagersManagersObjects(objects=test_data_managers)]
+        )
+    )
+
+    terminate_manager_mock = AsyncMock(
+        return_value=TerminateManagerManagerTerminate(
+            uuid=test_data_managers[0]["uuid"]
+        )
+    )
+
+    mo_mock = AsyncMock(
+        get_engagement_objects_by_uuids=get_engagement_objects_by_uuids_mock,
+        get_employee_managers=get_employee_managers_mock,
+        terminate_manager=terminate_manager_mock,
+    )
+
+    # invoke
+    await engagement_event_handler(mo_mock, test_data_event_engagement_uuid, None)
+
+    # asserts
+    get_engagement_objects_by_uuids_mock.assert_called_once()
+    get_employee_managers_mock.assert_has_calls([call([person_uuid_shared])])
+    terminate_manager_mock.assert_has_calls(
+        [
+            call(
+                uuid=test_data_managers[0]["uuid"],
+                terminate_from=(
+                    test_data_engagements[0]["validity"]["to"] + timedelta(days=1)
+                ).date(),
+                terminate_to=(
+                    test_data_engagements[2]["validity"]["from"] - timedelta(days=1)
+                ).date(),
+            )
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_engagement_event_handler_engagements_across_orgunits_no_infinity():
+    # test data
+    person_uuid_shared = uuid.uuid4()
+    ou_uuid_1 = uuid.uuid4()
+    ou_uuid_2 = uuid.uuid4()
+    ou_uuid_3 = uuid.uuid4()
+
+    test_data_engagements = [
+        {
+            "uuid": uuid.uuid4(),
+            "person": [{"uuid": person_uuid_shared}],
+            "org_unit": [{"uuid": ou_uuid_1}],
+            "validity": {
+                "from": datetime(2023, 1, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": datetime(2023, 2, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+            },
+        },
+        {
+            "uuid": uuid.uuid4(),
+            "person": [{"uuid": person_uuid_shared}],
+            "org_unit": [{"uuid": ou_uuid_2}],
+            "validity": {
+                "from": datetime(2023, 7, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": datetime(2023, 8, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+            },
+        },
+        {
+            "uuid": uuid.uuid4(),
+            "person": [{"uuid": person_uuid_shared}],
+            "org_unit": [{"uuid": ou_uuid_3}],
+            "validity": {
+                "from": datetime(2023, 1, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": datetime(2023, 5, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+            },
+        },
+        {
+            "uuid": uuid.uuid4(),
+            "person": [{"uuid": person_uuid_shared}],
+            "org_unit": [{"uuid": ou_uuid_3}],
+            "validity": {
+                "from": datetime(2023, 9, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": datetime(2023, 11, 30, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+            },
+        },
+    ]
+
+    test_data_managers = [
+        {
+            "uuid": uuid.uuid4(),
+            "org_unit": [{"uuid": ou_uuid_1}],
+            "person": [
+                {
+                    "uuid": person_uuid_shared,
+                    "engagements": test_data_engagements,
+                }
+            ],
+            "validity": {
+                "from": datetime(2023, 1, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": None,
+            },
+        },
+    ]
+
+    test_data_event_engagement_uuid = uuid.uuid4()
+
+    # mocking
+    get_engagement_objects_by_uuids_mock = AsyncMock(
+        return_value=GetEngagementObjectsByUuidEngagements(
+            objects=[
+                GetEngagementObjectsByUuidEngagementsObjects(
+                    # NOTE: This object is just used to get the person_uuid,
+                    # which is used later on to fetch employee managers
+                    objects=[
+                        {
+                            "uuid": uuid.uuid4(),
+                            "person": [{"uuid": person_uuid_shared}],
+                            "org_unit": [{"uuid": ou_uuid_1}],
+                            "validity": {
+                                "from": datetime(2023, 1, 1, 0, 0, 0).replace(
+                                    tzinfo=DEFAULT_TIMEZONE
+                                ),
+                                "to": None,
+                            },
+                        },
+                    ]
+                )
+            ]
+        )
+    )
+
+    get_employee_managers_mock = AsyncMock(
+        return_value=GetEmployeeManagersManagers(
+            objects=[GetEmployeeManagersManagersObjects(objects=test_data_managers)]
+        )
+    )
+
+    terminate_manager_mock = AsyncMock(
+        return_value=TerminateManagerManagerTerminate(
+            uuid=test_data_managers[0]["uuid"]
+        )
+    )
+
+    mo_mock = AsyncMock(
+        get_engagement_objects_by_uuids=get_engagement_objects_by_uuids_mock,
+        get_employee_managers=get_employee_managers_mock,
+        terminate_manager=terminate_manager_mock,
+    )
+
+    # invoke
+    await engagement_event_handler(mo_mock, test_data_event_engagement_uuid, None)
+
+    # asserts
+    get_engagement_objects_by_uuids_mock.assert_called_once()
+    get_employee_managers_mock.assert_has_calls([call([person_uuid_shared])])
+    terminate_manager_mock.assert_has_calls(
+        [
+            call(
+                uuid=test_data_managers[0]["uuid"],
+                terminate_from=(
+                    test_data_engagements[2]["validity"]["to"] + timedelta(days=1)
+                ).date(),
+                terminate_to=(
+                    test_data_engagements[1]["validity"]["from"] - timedelta(days=1)
+                ).date(),
+            ),
+            call(
+                uuid=test_data_managers[0]["uuid"],
+                terminate_from=(
+                    test_data_engagements[1]["validity"]["to"] + timedelta(days=1)
+                ).date(),
+                terminate_to=(
+                    test_data_engagements[3]["validity"]["from"] - timedelta(days=1)
+                ).date(),
+            ),
+            call(
+                uuid=test_data_managers[0]["uuid"],
                 terminate_from=None,
-                terminate_to=date(2023, 11, 30),
+                terminate_to=test_data_engagements[3]["validity"]["to"].date(),
             ),
         ]
     )
