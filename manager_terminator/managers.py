@@ -65,38 +65,13 @@ async def invalid_manager_periods(
     ```
     """
 
-    def engagement_belongs_to_manager_org_unit(engagement, manager_obj):
-        """Checks if an engagement belongs to the same org_unit as the manager.
-
-        Args:
-            engagement: An engagement object.
-            manager_obj: A manager object.
-
-        Returns:
-            True if the engagement belongs to the same org_unit as the manager.
-        """
-        eng_org_unit_uuids = {ou.uuid for ou in engagement.org_unit}
-        manager_org_unit_uuids = {ou.uuid for ou in manager_obj.org_unit}
-        return bool(
-            eng_org_unit_uuids & manager_org_unit_uuids
-        )  # returns True if there's an intersection
-
     all_invalid_periods = []
     for manager in managers:
         for manager_obj in manager.objects:
-            valid_manager_employee_engagements = filter(
-                lambda engagement: engagement_belongs_to_manager_org_unit(
-                    engagement, manager_obj
-                ),
-                [
-                    engagement
-                    for manager_employee in manager_obj.person or []
-                    for engagement in manager_employee.engagements or []
-                ],
-            )
-
             valid_engagement_validities = [
-                engagement.validity for engagement in valid_manager_employee_engagements
+                engagement.validity
+                for manager_employee in manager_obj.person or []
+                for engagement in manager_employee.engagements or []
             ]
 
             all_invalid_periods.extend(
@@ -199,16 +174,21 @@ def _find_gaps(
                 )
             )
 
-    # Check for the gap after the last period, only if last period has an end date
-    last_period_end_date = engagement_validities[-1].to
-    if last_period_end_date and last_period_end_date < manager_end_date:
-        gaps.append(
-            InvalidManagerPeriod(
-                uuid=manager.uuid,
-                from_=last_period_end_date + datetime.timedelta(days=1),
-                to=manager_end_date,
+    # check if any of the engagments have a to_date = None, if not, check if the last period is invalid
+    engagements_have_to_date_none = any(
+        eng_validity.to is None for eng_validity in engagement_validities
+    )
+    if not engagements_have_to_date_none:
+        # Check for the gap after the last period, only if last period has an end date
+        last_period_end_date = engagement_validities[-1].to
+        if last_period_end_date and last_period_end_date < manager_end_date:
+            gaps.append(
+                InvalidManagerPeriod(
+                    uuid=manager.uuid,
+                    from_=last_period_end_date + datetime.timedelta(days=1),
+                    to=manager_end_date,
+                )
             )
-        )
 
     # Only return gaps that are within the manager's validity
     invalid_manager_gaps = [
