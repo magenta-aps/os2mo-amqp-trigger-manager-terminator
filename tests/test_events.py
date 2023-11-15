@@ -268,7 +268,7 @@ async def test_engagement_event_handler_complex_data():
             "person": [{"uuid": shared_person_uuid_1}],
             "validity": {
                 "from": datetime(2023, 1, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
-                "to": datetime(2023, 11, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": datetime(2023, 9, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
             },
         },
         {
@@ -295,7 +295,7 @@ async def test_engagement_event_handler_complex_data():
             "person": [{"uuid": shared_person_uuid_1}],
             "validity": {
                 "from": datetime(2023, 11, 1, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
-                "to": datetime(2023, 11, 30, 0, 0, 0).replace(tzinfo=DEFAULT_TIMEZONE),
+                "to": None,
             },
         },
     ]
@@ -370,8 +370,12 @@ async def test_engagement_event_handler_complex_data():
         [
             call(
                 uuid=test_data_managers[0]["uuid"],
-                terminate_from=None,
-                terminate_to=date(2023, 11, 30),
+                terminate_from=(
+                    test_data_engagements[0]["validity"]["to"] + timedelta(days=1)
+                ).date(),
+                terminate_to=(
+                    test_data_engagements[1]["validity"]["from"] - timedelta(days=1)
+                ).date(),
             ),
         ]
     )
