@@ -22,7 +22,7 @@ variables:
   POETRY_VERSION: "1.5.1"
 
   PRODUCT: os2mo
-  COMPONENT: manager_terminator
+  COMPONENT: manager-terminator
 
 
 # Conditions
