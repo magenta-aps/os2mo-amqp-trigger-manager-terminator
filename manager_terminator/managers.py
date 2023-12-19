@@ -48,8 +48,8 @@ async def invalid_manager_periods(
     """Goes through a list of managers and returns periods, if any, where the manager is invalid.
 
     An invalid manager period, is a period where the manager validity is ACTIVE,
-    but the related manager-employee does not have an ACTIVE engagement for
-    the manager org_unit in the same period.
+    but the related manager-employee does not have an ACTIVE engagement in *any* org_unit
+    in the same period.
 
     ```
     Initial:
