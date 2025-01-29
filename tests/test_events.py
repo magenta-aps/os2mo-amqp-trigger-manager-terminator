@@ -686,15 +686,15 @@ async def test_process_engagements_event_terminate_managers_successfully(
     mocked_mo_client.get_engagement_objects.return_value = ENGAGEMENT_OBJECTS
     engagement_uuid = UUID("fa5e2af6-ae28-4b6b-8895-3b7d39f93d54")
     manager_uuid = UUID("29aaf8f7-4bc2-4d3d-ba8f-ed9fd457c101")
-    termination_date = (
-        mock_get_latest_end_date_from_engagement_objects.return_value
-    ) = datetime(
-        2023,
-        9,
-        20,
-        0,
-        0,
-        tzinfo=timezone(timedelta(seconds=7200)),
+    termination_date = mock_get_latest_end_date_from_engagement_objects.return_value = (
+        datetime(
+            2023,
+            9,
+            20,
+            0,
+            0,
+            tzinfo=timezone(timedelta(seconds=7200)),
+        )
     )
     await process_engagement_events(mocked_mo_client, engagement_uuid=engagement_uuid)
 

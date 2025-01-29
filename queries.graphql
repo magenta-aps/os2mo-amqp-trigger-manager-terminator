@@ -2,11 +2,9 @@
 # SPDX-License-Identifier: MPL-2.0
 
 query GetManagers {
-  managers(filter: {
-    from_date: null, to_date: null
-  }) {
+  managers(filter: { from_date: null, to_date: null }) {
     objects {
-      objects {
+      validities(start: null, end: null) {
         uuid
         org_unit {
           uuid
@@ -32,20 +30,22 @@ query GetManagers {
   }
 }
 
-mutation TerminateManager($uuid: UUID!, $terminate_from: DateTime, $terminate_to: DateTime!) {
-  manager_terminate(input: {
-    uuid: $uuid,
-    from: $terminate_from
-    to: $terminate_to
-  }) {
+mutation TerminateManager(
+  $uuid: UUID!
+  $terminate_from: DateTime
+  $terminate_to: DateTime!
+) {
+  manager_terminate(
+    input: { uuid: $uuid, from: $terminate_from, to: $terminate_to }
+  ) {
     uuid
   }
 }
 
 query GetEngagementObjects($engagement_uuid: UUID!) {
-  engagements(filter: {uuids: [$engagement_uuid]}) {
+  engagements(filter: { uuids: [$engagement_uuid] }) {
     objects {
-      objects {
+      validities {
         org_unit {
           uuid
           name
@@ -83,9 +83,11 @@ query GetEngagementObjects($engagement_uuid: UUID!) {
 }
 
 query GetEngagementObjectsByUuids($engagement_uuids: [UUID!]!) {
-  engagements(filter: {uuids: $engagement_uuids, from_date: null, to_date: null}) {
+  engagements(
+    filter: { uuids: $engagement_uuids, from_date: null, to_date: null }
+  ) {
     objects {
-      objects {
+      validities(start: null, end: null) {
         uuid
         org_unit {
           uuid
@@ -103,9 +105,11 @@ query GetEngagementObjectsByUuids($engagement_uuids: [UUID!]!) {
 }
 
 query GetEmployeeManagers($employee_uuids: [UUID!]!) {
-  managers(filter: {employees: $employee_uuids, from_date: null, to_date: null}) {
+  managers(
+    filter: { employees: $employee_uuids, from_date: null, to_date: null }
+  ) {
     objects {
-      objects {
+      validities(start: null, end: null) {
         uuid
         org_unit {
           uuid

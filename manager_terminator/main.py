@@ -7,9 +7,9 @@ from fastapi import APIRouter
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from fastramqpi.main import FastRAMQPI
-from ramqp.depends import RateLimit
-from ramqp.mo import MORouter
-from ramqp.mo import PayloadUUID
+from fastramqpi.ramqp.depends import RateLimit
+from fastramqpi.ramqp.mo import MORouter
+from fastramqpi.ramqp.mo import PayloadUUID
 from starlette.status import HTTP_200_OK
 
 import manager_terminator.engagements as engagements
@@ -124,6 +124,7 @@ def create_fastramqpi(**kwargs) -> FastRAMQPI:
     fastramqpi = FastRAMQPI(
         application_name="os2mo-manager-terminator",
         settings=settings.fastramqpi,
+        graphql_version=22,
         graphql_client_cls=GraphQLClient,
     )
 

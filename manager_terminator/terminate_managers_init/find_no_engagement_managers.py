@@ -28,11 +28,11 @@ def extract_managers_with_no_persons_or_engagements(
     """
     termination_objects = []
     for manager in manager_objects:
-        manager_uuid = one(manager.objects).uuid
-        manager_org_unit_list = one(manager.objects).org_unit
+        manager_uuid = one(manager.validities).uuid
+        manager_org_unit_list = one(manager.validities).org_unit
 
         # Managers engagement details
-        employee_data = one(manager.objects).person
+        employee_data = one(manager.validities).person
 
         # If "employee": None or the "employee": [{"engagements": []}]
         if employee_data is None or not any(e.engagements for e in employee_data):

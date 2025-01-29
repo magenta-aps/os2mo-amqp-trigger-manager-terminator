@@ -45,10 +45,10 @@ async def process_engagement_events(mo: GraphQLClient, engagement_uuid: UUID) ->
         )
         return
 
-    engagement_objects = one(one(engagement_objects_as_models.objects).objects)
+    engagement_validities = one(one(engagement_objects_as_models.objects).validities)
 
-    engagement_org_unit = engagement_objects.org_unit
-    employee_objects = engagement_objects.person
+    engagement_org_unit = engagement_validities.org_unit
+    employee_objects = engagement_validities.person
 
     try:
         # Person is not a manager, end the process.
@@ -95,7 +95,9 @@ async def process_engagement_events(mo: GraphQLClient, engagement_uuid: UUID) ->
             )
             return
 
-        await mo.terminate_manager(farthest_engagement_date_retrieved, manager_uuid)
+        await mo.terminate_manager(
+            uuid=manager_uuid, terminate_to=farthest_engagement_date_retrieved
+        )
         logger.info(
             "Terminating manager role on same date as farthest engagement end date."
         )
