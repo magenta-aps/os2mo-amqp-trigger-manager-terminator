@@ -10,7 +10,7 @@ from manager_terminator.terminate_managers_init.find_no_engagement_managers impo
 logger = structlog.get_logger(__name__)
 
 
-async def terminator_initialiser(mo: GraphQLClient) -> None:
+async def search_empty_manager_roles(mo: GraphQLClient) -> None:
     """
     Function that will look for any empty manager roles - if any are found,
     they will be terminated.
@@ -40,8 +40,14 @@ async def terminator_initialiser(mo: GraphQLClient) -> None:
             "No manager roles without a person or engagements associated found."
         )
         return
+    set_to_vacant = False 
+    if(set_to_vacant):
+        await update_manager_roles_vacant(mo, list_of_manager_uuids_and_termination_dates)
+    else:
+        await terminate_manager_roles(mo, list_of_manager_uuids_and_termination_dates)
 
-    # Found empty managers.
+
+async def terminate_manager_roles(mo: GraphQLClient, list_of_manager_uuids_and_termination_dates):
     for manager_to_terminate in list_of_manager_uuids_and_termination_dates:
         manager_uuid = manager_to_terminate.get("uuid")
         termination_date = manager_to_terminate.get("termination_date")
@@ -52,3 +58,15 @@ async def terminator_initialiser(mo: GraphQLClient) -> None:
         "Terminated empty manager(s) with uuid(s):",
         manager_uuids=list_of_manager_uuids_and_termination_dates,
     )
+async def update_manager_roles_vacant(mo: GraphQLClient, list_of_manager_uuids_and_termination_dates):
+    for manager_to_update in list_of_manager_uuids_and_termination_dates:
+        manager_uuid = manager_to_update.get("uuid")
+        vacant_from = manager_to_update.get("termination_date")
+
+        await mo.update_manager(manager_uuid, vacant_from)  # type: ignore
+
+    logger.info(
+        "Updated empty manager(s) to vacant with uuid(s):",
+        manager_uuids=list_of_manager_uuids_and_termination_dates,
+    )
+

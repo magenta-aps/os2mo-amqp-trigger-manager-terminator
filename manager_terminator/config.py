@@ -9,6 +9,7 @@ class ManagerTerminatorSettings(BaseSettings):
     """Settings for the manager terminator AMQP trigger."""
 
     log_level: str = "INFO"
+    set_to_vacant: bool = False
 
     class Config:
         """Settings are frozen."""

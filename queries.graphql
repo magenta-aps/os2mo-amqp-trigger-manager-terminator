@@ -42,6 +42,16 @@ mutation TerminateManager($uuid: UUID!, $terminate_from: DateTime, $terminate_to
   }
 }
 
+mutation UpdateManager($uuid: UUID!, $vacant_from: DateTime!) {
+  manager_terminate(input: {
+    uuid: $uuid,
+    from: $vacant_from
+    person: null
+  }) {
+    uuid
+  }
+}
+
 query GetEngagementObjects($engagement_uuid: UUID!) {
   engagements(filter: {uuids: [$engagement_uuid]}) {
     objects {
