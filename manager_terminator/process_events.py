@@ -39,20 +39,20 @@ async def process_engagement_events(mo: GraphQLClient, engagement_uuid: UUID) ->
     # Make a Graphql query to pull the engagement and its possible objects from MO.
     engagement_objects_as_models = await mo.get_engagement_objects(engagement_uuid)
 
-    if not engagement_objects_as_models.objects:
+    if not len(engagement_objects_as_models):
         logger.info(
             "No engagement objects found - event might be a termination. End process."
         )
         return
 
-    engagement_objects = one(one(engagement_objects_as_models.objects).objects)
+    engagement_objects = one(one(engagement_objects_as_models["objects"])["validities"])
 
-    engagement_org_unit = engagement_objects.org_unit
-    employee_objects = engagement_objects.person
+    engagement_org_unit = engagement_objects["org_unit"]
+    employee_objects = engagement_objects["person"]
 
     try:
         # Person is not a manager, end the process.
-        if len(one(employee_objects).manager_roles) == 0:
+        if len(one(employee_objects)["manager_roles"]) == 0:
             logger.info("The person is not a manager. Event exited.")
             return
 

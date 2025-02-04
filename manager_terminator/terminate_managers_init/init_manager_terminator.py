@@ -26,7 +26,7 @@ async def search_empty_manager_roles(mo: GraphQLClient) -> None:
     )
     manager_objects_as_models = await mo.get_managers()
 
-    manager_objects = manager_objects_as_models.objects
+    manager_objects = manager_objects_as_models["objects"]
 
     # Get the manager roles uuids and the termination dates, if no person or
     # engagements are associated with the manager.
@@ -40,7 +40,7 @@ async def search_empty_manager_roles(mo: GraphQLClient) -> None:
             "No manager roles without a person or engagements associated found."
         )
         return
-    set_to_vacant = False 
+    set_to_vacant = True 
     if(set_to_vacant):
         await update_manager_roles_vacant(mo, list_of_manager_uuids_and_termination_dates)
     else:

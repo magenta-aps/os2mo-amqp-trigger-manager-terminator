@@ -14,6 +14,6 @@ async def get_by_uuid(
     resp_engagement_objs = await mo.get_engagement_objects_by_uuids([engagement_uuid])
     return [
         obj
-        for wrapper_obj in resp_engagement_objs.objects
-        for obj in wrapper_obj.objects
+        for wrapper_obj in resp_engagement_objs["objects"]
+        for obj in wrapper_obj["validities"]
     ]
