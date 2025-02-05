@@ -41,8 +41,6 @@ type = "datetime.datetime"
 [tool.ariadne-codegen.scalars.UUID]
 type = "uuid.UUID"
 
-[tool.mypy]
-plugins = "pydantic.mypy, pydantic.v1.mypy"
 
 [build-system]
 requires = ["poetry-core"]

@@ -36,9 +36,7 @@ def check_for_end_date(
     Example:
         "True"
     """
-    print("xxxxxxxxx")
-    print(org_unit_from_engagement_objects)
-    
+
     engagements_org_unit_uuid = one(org_unit_from_engagement_objects)["uuid"]
     engagements = one(employee_from_engagement_objects)["engagements"]
 

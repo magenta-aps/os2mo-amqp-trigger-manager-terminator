@@ -21,5 +21,7 @@ def validity_timezone_aware(
 ):
     return {
         "from": validity["from"].replace(tzinfo=DEFAULT_TIMEZONE),
-        "to": validity["to"].replace(tzinfo=DEFAULT_TIMEZONE) if validity["to"] else None,
+        "to": validity["to"].replace(tzinfo=DEFAULT_TIMEZONE)
+        if validity["to"]
+        else None,
     }

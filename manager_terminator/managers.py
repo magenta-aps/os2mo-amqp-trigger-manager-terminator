@@ -2,8 +2,6 @@
 # SPDX-License-Identifier: MPL-2.0
 import datetime
 import json
-
-import uuid
 from uuid import UUID
 
 import structlog
@@ -34,7 +32,6 @@ async def get(mo: GraphQLClient) -> list[GetManagersManagersObjects]:
     """
 
     gql_response = await mo.get_managers()
-    print(gql_response)
     return gql_response["objects"]
 
 
@@ -69,8 +66,6 @@ async def invalid_manager_periods(
     """
 
     all_invalid_periods = []
-    print("zzzzzzzzzzzzzzzzzz")
-    print(managers)
     for manager in managers:
         for manager_obj in manager["validities"]:
             valid_engagement_validities = [
@@ -115,6 +110,33 @@ async def terminate_manager_periods(
             raise e
 
     return terminated_manager_periods
+
+
+async def update_manager_to_vacant(
+    mo: GraphQLClient, periods: list[InvalidManagerPeriod]
+) -> list[InvalidManagerPeriod]:
+    updated_manager_periods = []
+    for period in periods:
+        update_args = {
+            "uuid": period.uuid,
+            "update_from": period.to.date(),
+        }
+
+        if period.to is POSITIVE_INFINITY:
+            update_args["update_from"] = (
+                period.from_ - datetime.timedelta(days=1)
+            ).date()
+
+        try:
+            updated_manager_periods.append(await mo.update_manager(**update_args))
+        except Exception as e:
+            logger.error(
+                "Failed to update invalid manager period to vacant: %s"
+                % json.dumps(jsonable_encoder(period))
+            )
+            raise e
+
+    return updated_manager_periods
 
 
 # Helper methods for this module

@@ -41,7 +41,7 @@ mutation TerminateManager($uuid: UUID!, $terminate_from: DateTime, $terminate_to
 }
 
 mutation UpdateManager($uuid: UUID!, $vacant_from: DateTime!) {
-  manager_terminate(input: {
+  manager_update(input: {
     uuid: $uuid,
     from: $vacant_from
     person: null
