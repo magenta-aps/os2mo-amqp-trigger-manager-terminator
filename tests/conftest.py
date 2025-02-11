@@ -18,15 +18,6 @@ def settings_overrides() -> Iterator[dict[str, str]]:
     overrides = {
         "CLIENT_ID": "Foo",
         "CLIENT_SECRET": "bar",
-        "LDAP_CONTROLLERS": '[{"host": "localhost"}]',
-        "LDAP_DOMAIN": "LDAP",
-        "LDAP_USER": "foo",
-        "LDAP_PASSWORD": "foo",
-        "LDAP_SEARCH_BASE": "DC=ad,DC=addev",
-        "LDAP_OBJECT_CLASS": "inetOrgPerson",
-        "LDAP_CPR_ATTRIBUTE": "employeeID",
-        "DEFAULT_ORG_UNIT_LEVEL": "foo",
-        "DEFAULT_ORG_UNIT_TYPE": "foo",
         "FASTRAMQPI__AMQP__URL": "amqp://guest:guest@msg_broker:5672/",
         "FASTRAMQPI__DATABASE__USER": "fastramqpi",
         "FASTRAMQPI__DATABASE__PASSWORD": "fastramqpi",
@@ -57,11 +48,6 @@ def load_settings_overrides(
         if os.environ.get(key) is None:
             monkeypatch.setenv(key, value)
     yield settings_overrides
-
-
-# @pytest.fixture
-# def integration_test_set_to_vacant(monkeypatch: pytest.MonkeyPatch) -> None:
-#     monkeypatch.setenv("SET_TO_VACANT", "True")
 
 
 @pytest.fixture

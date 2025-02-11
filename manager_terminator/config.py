@@ -8,11 +8,12 @@ from pydantic import BaseSettings
 class ManagerTerminatorSettings(BaseModel):
     """Settings for the manager terminator AMQP trigger."""
 
-    log_level: str = "INFO"
     set_to_vacant: bool = False
 
 
 class Settings(BaseSettings):
+    log_level: str = "INFO"
+
     class Config:
         frozen = True
         env_nested_delimiter = "__"
