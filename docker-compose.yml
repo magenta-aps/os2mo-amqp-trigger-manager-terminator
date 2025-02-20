@@ -1,25 +1,24 @@
 # SPDX-FileCopyrightText: 2023 Magenta ApS <https://magenta.dk>
 # SPDX-License-Identifier: MPL-2.0
-version: "3.9"
 services:
   terminator:
     build: .
     command: ["uvicorn", "--factory", "manager_terminator.main:create_app", "--host", "0.0.0.0", "--reload"]
-    env_file:
-      - docker.env
     environment:
       LOG_LEVEL: DEBUG
+      MANAGER_TERMINATOR__LOG_LEVEL: DEBUG
+      # MANAGER_TERMINATOR__SET_TO_VACANT: "True"
+      FASTRAMQPI__AMQP__URL: "amqp://guest:guest@msg-broker:5672/"
+      FASTRAMQPI__MO_URL: "http://mo:5000"
+      FASTRAMQPI__AUTH_SERVER: "http://keycloak:8080/auth"
+      FASTRAMQPI__CLIENT_ID: "dipex"
+      FASTRAMQPI__CLIENT_SECRET: "603f1c82-d012-4d04-9382-dbe659c533fb"
     networks:
       - os2mo_default
     volumes:
       - ./manager_terminator:/app/manager_terminator
     ports:
       - "127.0.0.1:8000:8000"
-
-#networks:
-#  default:
-#    external: true
-#    name: os2mo_default
 
 networks:
   os2mo_default:

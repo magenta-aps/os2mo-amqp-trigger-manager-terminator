@@ -54,7 +54,8 @@ repos:
           - pydantic==1.10.12
           - pytest
           - structlog
-        exclude: ^tests/
+        exclude: ^tests/|main.py
+        # TODO: Shouldn't only be one this file?
         files: tests/test_data.py
 
 
