@@ -11,7 +11,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 pytest-split = "^0.8"
-pytest-asyncio = "^0.21"
+pytest-asyncio = "^0.25"
 pytest-cov = "^4"
 fastramqpi = "^10"
 uvicorn = "^0.23"
