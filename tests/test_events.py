@@ -309,68 +309,161 @@ async def test_update_engagement_event_handler(monkeypatch: pytest.MonkeyPatch):
     with monkeypatch.context() as con:
         con.setenv("MANAGER_TERMINATOR__SET_TO_VACANT", "True")
         settings = Settings()
-        # mocking
-        get_engagement_objects_by_uuids_mock = AsyncMock(
-            return_value=GetEngagementObjectsByUuidEngagements.parse_obj(
-                test_data_engagement_objs
+
+        engagement_uuid = uuid.uuid4()
+        org_unit_uuid = uuid.uuid4()
+        manager_uuid = uuid.uuid4()
+
+        mo = AsyncMock()
+        mo.get_engagement_objects_by_uuids.return_value = (
+            GetEngagementObjectsByUuidEngagements.parse_obj(
+                {
+                    "objects": [
+                        {
+                            "validities": [
+                                {
+                                    "uuid": engagement_uuid,
+                                    "person": [{"uuid": uuid.uuid4()}],
+                                    "org_unit": [{"uuid": org_unit_uuid}],
+                                    "validity": {
+                                        "from": datetime(
+                                            2015,
+                                            1,
+                                            10,
+                                            tzinfo=timezone(timedelta(hours=1)),
+                                        ),
+                                        "to": datetime(
+                                            2015,
+                                            1,
+                                            15,
+                                            tzinfo=timezone(timedelta(hours=1)),
+                                        ),
+                                    },
+                                },
+                                {
+                                    "uuid": engagement_uuid,
+                                    "person": [{"uuid": uuid.uuid4()}],
+                                    "org_unit": [{"uuid": org_unit_uuid}],
+                                    "validity": {
+                                        "from": datetime(
+                                            2015,
+                                            1,
+                                            15,
+                                            tzinfo=timezone(timedelta(hours=1)),
+                                        ),
+                                        "to": datetime(
+                                            2015,
+                                            1,
+                                            30,
+                                            tzinfo=timezone(timedelta(hours=1)),
+                                        ),
+                                    },
+                                },
+                            ]
+                        }
+                    ]
+                }
             )
         )
 
-        get_employee_managers_mock = AsyncMock(
-            return_value=GetManagersManagers.parse_obj(test_data_managers)
-        )
-        update_manager_mock = AsyncMock(
-            return_value=test_data_managers["objects"][1]["validities"][0]["uuid"]
+        mo.get_employee_managers.return_value = GetManagersManagers.parse_obj(
+            {
+                "objects": [
+                    {
+                        "validities": [
+                            {
+                                "uuid": manager_uuid,
+                                "org_unit": [{"uuid": org_unit_uuid}],
+                                "person": [
+                                    {
+                                        "uuid": uuid.uuid4(),
+                                        "engagements": [
+                                            {
+                                                "uuid": engagement_uuid,
+                                                "org_unit": [{"uuid": org_unit_uuid}],
+                                                "validity": {
+                                                    "from": datetime(
+                                                        2015,
+                                                        1,
+                                                        10,
+                                                        tzinfo=timezone(
+                                                            timedelta(hours=1)
+                                                        ),
+                                                    ),
+                                                    "to": datetime(
+                                                        2015,
+                                                        1,
+                                                        15,
+                                                        tzinfo=timezone(
+                                                            timedelta(hours=1)
+                                                        ),
+                                                    ),
+                                                },
+                                            },
+                                            {
+                                                "uuid": engagement_uuid,
+                                                "org_unit": [{"uuid": org_unit_uuid}],
+                                                "validity": {
+                                                    "from": datetime(
+                                                        2015,
+                                                        1,
+                                                        15,
+                                                        tzinfo=timezone(
+                                                            timedelta(hours=1)
+                                                        ),
+                                                    ),
+                                                    "to": datetime(
+                                                        2015,
+                                                        1,
+                                                        30,
+                                                        tzinfo=timezone(
+                                                            timedelta(hours=1)
+                                                        ),
+                                                    ),
+                                                },
+                                            },
+                                        ],
+                                        "validity": {
+                                            "from": datetime(
+                                                2000,
+                                                1,
+                                                1,
+                                                tzinfo=timezone(timedelta(hours=1)),
+                                            ),
+                                            "to": None,
+                                        },
+                                    }
+                                ],
+                                "validity": {
+                                    "from": datetime(
+                                        2015,
+                                        1,
+                                        1,
+                                        tzinfo=timezone(timedelta(hours=1)),
+                                    ),
+                                    "to": None,
+                                },
+                            }
+                        ],
+                    }
+                ]
+            }
         )
 
-        mo_mock = AsyncMock(
-            get_engagement_objects_by_uuids=get_engagement_objects_by_uuids_mock,
-            get_employee_managers=get_employee_managers_mock,
-            update_manager=update_manager_mock,
-        )
+        mo.update_manager.return_value = manager_uuid
+
         # invoke
-        await engagement_event_handler(
-            mo_mock, test_data_engagement_uuid, settings, None
-        )
-
-        # asserts
-        get_engagement_objects_by_uuids_mock.assert_called_once()
-        get_employee_managers_mock.assert_has_calls(
+        await engagement_event_handler(mo, engagement_uuid, settings, None)
+        mo.update_manager.assert_has_calls(
             [
                 call(
-                    # OBS: We convert a set to a list, since this is how the logic does it
-                    # and if we just use an array directly, the array passed to the
-                    # function, will be sorted, which will make the test fail.
-                    list(
-                        {
-                            test_data_engagement_objs["objects"][0]["validities"][0][
-                                "person"
-                            ][0]["uuid"],
-                            test_data_engagement_objs["objects"][1]["validities"][0][
-                                "person"
-                            ][0]["uuid"],
-                            test_data_engagement_objs["objects"][2]["validities"][0][
-                                "person"
-                            ][0]["uuid"],
-                            test_data_engagement_objs["objects"][4]["validities"][0][
-                                "person"
-                            ][0]["uuid"],
-                        }
-                    )
-                )
-            ]
-        )
-        update_manager_mock.assert_has_calls(
-            [
-                call(
-                    uuid=test_data_managers["objects"][1]["validities"][0]["uuid"],
-                    vacant_from=date(2023, 1, 31),
+                    uuid=manager_uuid,
+                    vacant_from=date(2015, 1, 1),
+                    vacant_to=date(2015, 1, 9),
                 ),
                 call(
-                    uuid=test_data_managers["objects"][2]["validities"][0]["uuid"],
-                    vacant_from=test_data_engagement_objs["objects"][4]["validities"][
-                        0
-                    ]["validity"]["to"].date(),
+                    uuid=manager_uuid,
+                    vacant_from=date(2015, 1, 30),
                     vacant_to=None,
                 ),
             ]
