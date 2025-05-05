@@ -276,7 +276,14 @@ async def test_engagement_event_handler():
 @pytest.mark.asyncio
 @pytest.mark.usefixtures("minimal_valid_settings")
 async def test_update_engagement_event_handler(monkeypatch: pytest.MonkeyPatch):
-    """Tests the engagement_event_handler."""
+    """
+    Tests the engagement_event_handler.
+
+                               | 2015-01-01 → 2015-01-09| 2015-01-10 → 2015-01-15| 2015-01-15 → 2015-01-30| 2015-01-30 → ∞         |
+    Manager validity           |------------------------|------------------------|------------------------|------------------------>
+    Manager engagements        |                        |--------- E1 -----------|---------- E2 ----------|
+    "Assert" vacant periods    |------- vacant ---------|                        |                        |------- vacant --------->
+    """
 
     with monkeypatch.context() as con:
         con.setenv("MANAGER_TERMINATOR__SET_TO_VACANT", "True")
