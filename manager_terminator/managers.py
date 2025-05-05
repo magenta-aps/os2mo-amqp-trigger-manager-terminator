@@ -120,7 +120,8 @@ async def update_manager_to_vacant(
     for period in periods:
         update_args = {
             "uuid": period.uuid,
-            "vacant_from": period.to.date(),
+            "vacant_from": period.from_.date(),
+            "vacant_to": period.to.date(),
         }
 
         if period.to is POSITIVE_INFINITY:
@@ -190,9 +191,17 @@ def _find_gaps(
         # Check for a gap
         if current_end_date < next_start_date:
             invalid_from = current_end_date + datetime.timedelta(days=1)
-            invalid_to = next_start_date - datetime.timedelta(days=1)
+
+            # Don't create a gap if it starts after the manager ends
+            if invalid_from > manager_end_date:
+                continue
+
+            invalid_to = min(
+                next_start_date - datetime.timedelta(days=1), manager_end_date
+            )
+
             if invalid_to < invalid_from:
-                # OBS: This occures on tailing-engagements, where the next engagement starts the same day as the previous ends
+                # Happens when engagements are tightly aligned (no real gap)
                 continue
 
             gaps.append(
@@ -202,15 +211,17 @@ def _find_gaps(
                     to=invalid_to,
                 )
             )
-
     # check if any of the engagments have a to_date = None, if not, check if the last period is invalid
     engagements_have_to_date_none = any(
         eng_validity.to is None for eng_validity in engagement_validities
     )
     if not engagements_have_to_date_none:
-        # Check for the gap after the last period, only if last period has an end date
         last_period_end_date = engagement_validities[-1].to
-        if last_period_end_date and last_period_end_date < manager_end_date:
+        # Only consider a gap if the last engagement ends *before* the manager does
+        if (
+            last_period_end_date
+            and last_period_end_date + datetime.timedelta(days=1) <= manager_end_date
+        ):
             gaps.append(
                 InvalidManagerPeriod(
                     uuid=manager.uuid,
