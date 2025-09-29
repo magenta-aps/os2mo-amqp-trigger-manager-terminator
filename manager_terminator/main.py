@@ -86,7 +86,7 @@ async def engagement_event_handler(
         logger.error("No engagement objects found for", engagement_uuid=engagement_uuid)
         return
 
-    # Go through engagments and collect all unique engagement employee-uuids
+    # Go through engagements and collect all unique engagement employee-uuids
     employee_uuids = {
         employee.uuid
         for engagement in engagement_objects
