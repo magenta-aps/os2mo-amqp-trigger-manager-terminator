@@ -235,6 +235,7 @@ def _find_gaps(
         gap
         for gap in gaps
         if gap.from_ <= manager_end_date
+        and gap.from_ > manager.validity.from_
         and (gap.to is None or gap.to >= manager.validity.from_)
     ]
 
