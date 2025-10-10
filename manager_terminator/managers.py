@@ -45,7 +45,7 @@ async def get_by_employee_uuids(
     return gql_response.objects
 
 
-async def invalid_manager_periods(
+def invalid_manager_periods(
     managers: list[GetManagersManagersObjects],
 ) -> list[InvalidManagerPeriod]:
     """Goes through a list of managers and returns periods, if any, where the manager is invalid.
