@@ -10,7 +10,7 @@ query GetManagers {
           uuid
         }
         person {
-          engagements(filter: {from_date: null, to_date: null}) {
+          engagements(filter: { from_date: null, to_date: null }) {
             uuid
             org_unit {
               uuid
@@ -30,22 +30,30 @@ query GetManagers {
   }
 }
 
-mutation TerminateManager($uuid: UUID!, $terminate_from: DateTime, $terminate_to: DateTime!) {
-  manager_terminate(input: {
-    uuid: $uuid,
-    from: $terminate_from
-    to: $terminate_to
-  }) {
+mutation TerminateManager(
+  $uuid: UUID!
+  $terminate_from: DateTime
+  $terminate_to: DateTime!
+) {
+  manager_terminate(
+    input: { uuid: $uuid, from: $terminate_from, to: $terminate_to }
+  ) {
     uuid
   }
 }
 
-mutation UpdateManager($uuid: UUID!, $vacant_from: DateTime!, $vacant_to: DateTime) {
-  manager_update(input: {
-    uuid: $uuid,
-    validity: {from: $vacant_from, to: $vacant_to},
-    person: null
-  }) {
+mutation UpdateManager(
+  $uuid: UUID!
+  $vacant_from: DateTime!
+  $vacant_to: DateTime
+) {
+  manager_update(
+    input: {
+      uuid: $uuid
+      validity: { from: $vacant_from, to: $vacant_to }
+      person: null
+    }
+  ) {
     uuid
   }
 }
@@ -63,7 +71,7 @@ query GetEngagementObjects($engagement_uuid: UUID!) {
         }
         person {
           uuid
-          engagements(filter: {from_date: null, to_date: null}) {
+          engagements(filter: { from_date: null, to_date: null }) {
             uuid
             org_unit {
               uuid
@@ -112,7 +120,9 @@ query GetEngagementObjectsByUuids($engagement_uuids: [UUID!]!) {
 }
 
 query GetEmployeeManagers($employee_uuids: [UUID!]!) {
-  managers(filter: {employees: $employee_uuids, from_date: null, to_date: null}) {
+  managers(
+    filter: { employees: $employee_uuids, from_date: null, to_date: null }
+  ) {
     objects {
       validities {
         uuid
@@ -120,7 +130,7 @@ query GetEmployeeManagers($employee_uuids: [UUID!]!) {
           uuid
         }
         person {
-          engagements(filter: {from_date: null, to_date:null}) {
+          engagements(filter: { from_date: null, to_date: null }) {
             uuid
             org_unit {
               uuid

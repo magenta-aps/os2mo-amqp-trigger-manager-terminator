@@ -151,6 +151,14 @@ def _find_gaps(
         GetManagersManagersObjectsValiditiesPersonEngagementsValidity
     ],
 ) -> list[InvalidManagerPeriod]:
+    # Check if the manager role is actually assigned to a person.
+    # If 'manager.person' is empty/None, the position is Vacant.
+    # A Vacant position is a valid state (not a "gap"), so we return empty.
+    # This prevents the loop where we make a manager vacant, and then
+    # flag it as invalid on the next run because it has no engagements.
+    if not manager.person:
+        return []
+
     engagement_validities = sorted(engagement_validities, key=lambda x: x.from_)
     manager_end_date = manager.validity.to or POSITIVE_INFINITY
 
