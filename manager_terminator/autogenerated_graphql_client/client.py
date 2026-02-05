@@ -7,14 +7,13 @@ from uuid import UUID
 from .async_base_client import AsyncBaseClient
 from .base_model import UNSET
 from .base_model import UnsetType
-from .get_employee_managers import GetEmployeeManagers
-from .get_employee_managers import GetEmployeeManagersManagers
 from .get_engagement_objects import GetEngagementObjects
 from .get_engagement_objects import GetEngagementObjectsEngagements
 from .get_engagement_objects_by_uuids import GetEngagementObjectsByUuids
 from .get_engagement_objects_by_uuids import GetEngagementObjectsByUuidsEngagements
 from .get_managers import GetManagers
 from .get_managers import GetManagersManagers
+from .input_types import ManagerFilter
 from .terminate_manager import TerminateManager
 from .terminate_manager import TerminateManagerManagerTerminate
 from .update_manager import UpdateManager
@@ -26,11 +25,11 @@ def gql(q: str) -> str:
 
 
 class GraphQLClient(AsyncBaseClient):
-    async def get_managers(self) -> GetManagersManagers:
+    async def get_managers(self, filter: ManagerFilter) -> GetManagersManagers:
         query = gql(
             """
-            query GetManagers {
-              managers(filter: {from_date: null, to_date: null}) {
+            query GetManagers($filter: ManagerFilter!) {
+              managers(filter: $filter) {
                 objects {
                   validities {
                     uuid
@@ -59,7 +58,7 @@ class GraphQLClient(AsyncBaseClient):
             }
             """
         )
-        variables: dict[str, object] = {}
+        variables: dict[str, object] = {"filter": filter}
         response = await self.execute(query=query, variables=variables)
         data = self.get_data(response)
         return GetManagers.parse_obj(data).managers
@@ -196,43 +195,3 @@ class GraphQLClient(AsyncBaseClient):
         response = await self.execute(query=query, variables=variables)
         data = self.get_data(response)
         return GetEngagementObjectsByUuids.parse_obj(data).engagements
-
-    async def get_employee_managers(
-        self, employee_uuids: List[UUID]
-    ) -> GetEmployeeManagersManagers:
-        query = gql(
-            """
-            query GetEmployeeManagers($employee_uuids: [UUID!]!) {
-              managers(filter: {employees: $employee_uuids, from_date: null, to_date: null}) {
-                objects {
-                  validities {
-                    uuid
-                    org_unit {
-                      uuid
-                    }
-                    person {
-                      engagements(filter: {from_date: null, to_date: null}) {
-                        uuid
-                        org_unit {
-                          uuid
-                        }
-                        validity {
-                          from
-                          to
-                        }
-                      }
-                    }
-                    validity {
-                      from
-                      to
-                    }
-                  }
-                }
-              }
-            }
-            """
-        )
-        variables: dict[str, object] = {"employee_uuids": employee_uuids}
-        response = await self.execute(query=query, variables=variables)
-        data = self.get_data(response)
-        return GetEmployeeManagers.parse_obj(data).managers

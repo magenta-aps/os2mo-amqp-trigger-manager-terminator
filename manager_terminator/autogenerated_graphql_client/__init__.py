@@ -10,22 +10,6 @@ from .exceptions import GraphQLClientGraphQLError
 from .exceptions import GraphQLClientGraphQLMultiError
 from .exceptions import GraphQLClientHttpError
 from .exceptions import GraphQlClientInvalidResponseError
-from .get_employee_managers import GetEmployeeManagers
-from .get_employee_managers import GetEmployeeManagersManagers
-from .get_employee_managers import GetEmployeeManagersManagersObjects
-from .get_employee_managers import GetEmployeeManagersManagersObjectsValidities
-from .get_employee_managers import GetEmployeeManagersManagersObjectsValiditiesOrgUnit
-from .get_employee_managers import GetEmployeeManagersManagersObjectsValiditiesPerson
-from .get_employee_managers import (
-    GetEmployeeManagersManagersObjectsValiditiesPersonEngagements,
-)
-from .get_employee_managers import (
-    GetEmployeeManagersManagersObjectsValiditiesPersonEngagementsOrgUnit,
-)
-from .get_employee_managers import (
-    GetEmployeeManagersManagersObjectsValiditiesPersonEngagementsValidity,
-)
-from .get_employee_managers import GetEmployeeManagersManagersObjectsValiditiesValidity
 from .get_engagement_objects import GetEngagementObjects
 from .get_engagement_objects import GetEngagementObjectsEngagements
 from .get_engagement_objects import GetEngagementObjectsEngagementsObjects
@@ -275,16 +259,6 @@ __all__ = [
     "FileFilter",
     "FileStore",
     "FullEventFilter",
-    "GetEmployeeManagers",
-    "GetEmployeeManagersManagers",
-    "GetEmployeeManagersManagersObjects",
-    "GetEmployeeManagersManagersObjectsValidities",
-    "GetEmployeeManagersManagersObjectsValiditiesOrgUnit",
-    "GetEmployeeManagersManagersObjectsValiditiesPerson",
-    "GetEmployeeManagersManagersObjectsValiditiesPersonEngagements",
-    "GetEmployeeManagersManagersObjectsValiditiesPersonEngagementsOrgUnit",
-    "GetEmployeeManagersManagersObjectsValiditiesPersonEngagementsValidity",
-    "GetEmployeeManagersManagersObjectsValiditiesValidity",
     "GetEngagementObjects",
     "GetEngagementObjectsByUuids",
     "GetEngagementObjectsByUuidsEngagements",
