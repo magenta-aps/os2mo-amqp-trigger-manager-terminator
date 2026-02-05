@@ -7,7 +7,6 @@ from fastapi import APIRouter
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from fastramqpi.main import FastRAMQPI
-from fastramqpi.ramqp.depends import RateLimit
 from fastramqpi.ramqp.mo import MORouter
 from fastramqpi.ramqp.mo import PayloadUUID
 from starlette.status import HTTP_200_OK
@@ -73,12 +72,10 @@ async def initiate_terminator(
         )
 
 
-@amqp_router.register("engagement")
 async def engagement_event_handler(
     mo: depends.GraphQLClient,
     engagement_uuid: PayloadUUID,
     settings: Settings,
-    _: RateLimit,
 ):
     # Get all engagement objects related to the engagement-event
     engagement_objects = await engagements.get_by_uuid(mo, engagement_uuid)
@@ -148,7 +145,5 @@ def create_app() -> FastAPI:
     fastramqpi.add_context(settings=settings)
 
     app = fastramqpi.get_app()
-    mo_amqp_system = fastramqpi.get_amqpsystem()
-    mo_amqp_system.router.registry.update(amqp_router.registry)
 
     return app
