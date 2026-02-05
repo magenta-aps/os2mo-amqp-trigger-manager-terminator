@@ -5,6 +5,7 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
+from typing import Any
 from unittest.mock import AsyncMock
 from unittest.mock import call
 
@@ -25,7 +26,7 @@ test_data_engagement_uuid = uuid.uuid4()
 shared_orgunit_uuid = uuid.uuid4()
 shared_person_uuid = uuid.uuid4()
 
-test_data_engagement_objs = {
+test_data_engagement_objs: dict[str, Any] = {
     "objects": [
         {
             "validities": [

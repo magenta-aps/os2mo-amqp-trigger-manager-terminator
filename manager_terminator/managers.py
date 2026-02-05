@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MPL-2.0
 import datetime
 import json
+from typing import Any
 from uuid import UUID
 
 import structlog
@@ -95,10 +96,10 @@ async def invalid_manager_periods(
 
 async def terminate_manager_periods(
     mo: GraphQLClient, periods: list[InvalidManagerPeriod]
-) -> list[InvalidManagerPeriod]:
+) -> list[TerminateManagerManagerTerminate]:
     terminated_manager_periods = []
     for period in periods:
-        terminate_args = {
+        terminate_args: dict[str, Any] = {
             "uuid": period.uuid,
             "terminate_from": period.from_.date(),
             "terminate_to": period.to.date(),
@@ -125,10 +126,10 @@ async def terminate_manager_periods(
 
 async def update_manager_to_vacant(
     mo: GraphQLClient, periods: list[InvalidManagerPeriod]
-) -> list[InvalidManagerPeriod]:
+) -> list[UpdateManagerManagerUpdate]:
     updated_manager_periods = []
     for period in periods:
-        update_args = {
+        update_args: dict[str, Any] = {
             "uuid": period.uuid,
             "vacant_from": period.from_.date(),
             "vacant_to": period.to.date(),
@@ -207,6 +208,7 @@ def _find_gaps(
         current_end_date = engagement_validities[i].to
 
         # Check for a gap
+        assert current_end_date is not None
         if current_end_date < next_start_date:
             invalid_from = current_end_date + datetime.timedelta(days=1)
 
