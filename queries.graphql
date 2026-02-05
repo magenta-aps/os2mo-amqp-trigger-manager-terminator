@@ -1,8 +1,8 @@
 # SPDX-FileCopyrightText: 2023 Magenta ApS <https://magenta.dk>
 # SPDX-License-Identifier: MPL-2.0
 
-query GetManagers {
-  managers(filter: { from_date: null, to_date: null }) {
+query GetManagers($filter: ManagerFilter!) {
+  managers(filter: $filter) {
     objects {
       validities {
         uuid
@@ -119,33 +119,33 @@ query GetEngagementObjectsByUuids($engagement_uuids: [UUID!]!) {
   }
 }
 
-query GetEmployeeManagers($employee_uuids: [UUID!]!) {
-  managers(
-    filter: { employees: $employee_uuids, from_date: null, to_date: null }
-  ) {
-    objects {
-      validities {
-        uuid
-        org_unit {
-          uuid
-        }
-        person {
-          engagements(filter: { from_date: null, to_date: null }) {
-            uuid
-            org_unit {
-              uuid
-            }
-            validity {
-              from
-              to
-            }
-          }
-        }
-        validity {
-          from
-          to
-        }
-      }
-    }
-  }
-}
+#query GetEmployeeManagers($employee_uuids: [UUID!]!) {
+#  managers(
+#    filter: { employees: $employee_uuids, from_date: null, to_date: null }
+#  ) {
+#    objects {
+#      validities {
+#        uuid
+#        org_unit {
+#          uuid
+#        }
+#        person {
+#          engagements(filter: { from_date: null, to_date: null }) {
+#            uuid
+#            org_unit {
+#              uuid
+#            }
+#            validity {
+#              from
+#              to
+#            }
+#          }
+#        }
+#        validity {
+#          from
+#          to
+#        }
+#      }
+#    }
+#  }
+#}
