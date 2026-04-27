@@ -1,8 +1,12 @@
+# SPDX-FileCopyrightText: 2023 Magenta ApS <https://magenta.dk>
+# SPDX-License-Identifier: MPL-2.0
 import json
+from uuid import UUID
 
 import structlog
+from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
-from fastramqpi.ramqp.mo import PayloadUUID
+from fastramqpi.events import Event
 
 from manager_terminator import depends
 from manager_terminator import engagements
@@ -10,12 +14,14 @@ from manager_terminator import managers
 
 from .depends import Settings
 
-logger = structlog.get_logger(__name__)
+logger = structlog.stdlib.get_logger()
+
+events_router = APIRouter()
 
 
 async def engagement_event_handler(
     mo: depends.GraphQLClient,
-    engagement_uuid: PayloadUUID,
+    engagement_uuid: UUID,
     settings: Settings,
 ):
     # Get all engagement objects related to the engagement-event
@@ -72,3 +78,12 @@ async def engagement_event_handler(
             "Terminated invalid periods for manager(s): %s"
             % json.dumps(jsonable_encoder(terminated_invalid_manager_periods))
         )
+
+
+@events_router.post("/events/engagement")
+async def engagement_event(
+    gql_client: depends.GraphQLClient, settings: depends.Settings, event: Event[UUID]
+) -> None:
+    logger.info("Received engagement event", engagement_event=event.dict())
+
+    await engagement_event_handler(gql_client, event.subject, settings)
