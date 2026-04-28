@@ -3,7 +3,15 @@
 services:
   terminator:
     build: .
-    command: ["uvicorn", "--factory", "manager_terminator.main:create_app", "--host", "0.0.0.0", "--reload"]
+    command:
+      [
+        "uvicorn",
+        "--factory",
+        "manager_terminator.main:create_app",
+        "--host",
+        "0.0.0.0",
+        "--reload",
+      ]
     environment:
       LOG_LEVEL: DEBUG
       MANAGER_TERMINATOR__LOG_LEVEL: DEBUG
