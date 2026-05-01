@@ -149,3 +149,75 @@ query GetEngagementObjectsByUuids($engagement_uuids: [UUID!]!) {
 #    }
 #  }
 #}
+
+mutation _Testing_CreateEmployee($given_name: String!, $surname: String!) {
+  employee_create(input: { given_name: $given_name, surname: $surname }) {
+    uuid
+  }
+}
+
+mutation _Testing_CreateEngagement(
+  $from_date: DateTime!
+  $org_unit: UUID!
+  $engagement_type: UUID!
+  $job_function: UUID!
+  $person: UUID!
+) {
+  engagement_create(
+    input: {
+      validity: { from: $from_date }
+      org_unit: $org_unit
+      engagement_type: $engagement_type
+      job_function: $job_function
+      person: $person
+    }
+  ) {
+    uuid
+  }
+}
+
+mutation _Testing_CreateManager(
+  $person: UUID!
+  $responsibility: [UUID!]!
+  $org_unit: UUID!
+  $manager_level: UUID!
+  $manager_type: UUID!
+  $from_date: DateTime!
+) {
+  manager_create(
+    input: {
+      person: $person
+      responsibility: $responsibility
+      org_unit: $org_unit
+      manager_level: $manager_level
+      manager_type: $manager_type
+      validity: { from: $from_date }
+    }
+  ) {
+    uuid
+  }
+}
+
+mutation _Testing_CreateOrgUnit(
+  $from_date: DateTime!
+  $name: String!
+  $org_unit_type: UUID!
+  $parent: UUID
+) {
+  org_unit_create(
+    input: {
+      validity: { from: $from_date }
+      name: $name
+      org_unit_type: $org_unit_type
+      parent: $parent
+    }
+  ) {
+    uuid
+  }
+}
+
+mutation _Testing_TerminateEngagement($uuid: UUID!, $to: DateTime!) {
+  engagement_terminate(input: { uuid: $uuid, to: $to }) {
+    uuid
+  }
+}
