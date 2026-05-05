@@ -88,3 +88,6 @@ DEP002 = [
   # psycopg2 is used as a string in the postgres connector
   "psycopg2",
 ]
+
+[tool.pytest.ini_options]
+asyncio_mode="auto"
