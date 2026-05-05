@@ -4,6 +4,18 @@ from typing import Optional
 from typing import Union
 from uuid import UUID
 
+from ._testing__create_employee import TestingCreateEmployee
+from ._testing__create_employee import TestingCreateEmployeeEmployeeCreate
+from ._testing__create_engagement import TestingCreateEngagement
+from ._testing__create_engagement import TestingCreateEngagementEngagementCreate
+from ._testing__create_manager import TestingCreateManager
+from ._testing__create_manager import TestingCreateManagerManagerCreate
+from ._testing__create_org_unit import TestingCreateOrgUnit
+from ._testing__create_org_unit import TestingCreateOrgUnitOrgUnitCreate
+from ._testing__terminate_engagement import TestingTerminateEngagement
+from ._testing__terminate_engagement import (
+    TestingTerminateEngagementEngagementTerminate,
+)
 from .async_base_client import AsyncBaseClient
 from .base_model import UNSET
 from .base_model import UnsetType
@@ -195,3 +207,127 @@ class GraphQLClient(AsyncBaseClient):
         response = await self.execute(query=query, variables=variables)
         data = self.get_data(response)
         return GetEngagementObjectsByUuids.parse_obj(data).engagements
+
+    async def _testing__create_employee(
+        self, given_name: str, surname: str
+    ) -> TestingCreateEmployeeEmployeeCreate:
+        query = gql(
+            """
+            mutation _Testing_CreateEmployee($given_name: String!, $surname: String!) {
+              employee_create(input: {given_name: $given_name, surname: $surname}) {
+                uuid
+              }
+            }
+            """
+        )
+        variables: dict[str, object] = {"given_name": given_name, "surname": surname}
+        response = await self.execute(query=query, variables=variables)
+        data = self.get_data(response)
+        return TestingCreateEmployee.parse_obj(data).employee_create
+
+    async def _testing__create_engagement(
+        self,
+        from_date: datetime,
+        org_unit: UUID,
+        engagement_type: UUID,
+        job_function: UUID,
+        person: UUID,
+    ) -> TestingCreateEngagementEngagementCreate:
+        query = gql(
+            """
+            mutation _Testing_CreateEngagement($from_date: DateTime!, $org_unit: UUID!, $engagement_type: UUID!, $job_function: UUID!, $person: UUID!) {
+              engagement_create(
+                input: {validity: {from: $from_date}, org_unit: $org_unit, engagement_type: $engagement_type, job_function: $job_function, person: $person}
+              ) {
+                uuid
+              }
+            }
+            """
+        )
+        variables: dict[str, object] = {
+            "from_date": from_date,
+            "org_unit": org_unit,
+            "engagement_type": engagement_type,
+            "job_function": job_function,
+            "person": person,
+        }
+        response = await self.execute(query=query, variables=variables)
+        data = self.get_data(response)
+        return TestingCreateEngagement.parse_obj(data).engagement_create
+
+    async def _testing__create_manager(
+        self,
+        person: UUID,
+        responsibility: List[UUID],
+        org_unit: UUID,
+        manager_level: UUID,
+        manager_type: UUID,
+        from_date: datetime,
+    ) -> TestingCreateManagerManagerCreate:
+        query = gql(
+            """
+            mutation _Testing_CreateManager($person: UUID!, $responsibility: [UUID!]!, $org_unit: UUID!, $manager_level: UUID!, $manager_type: UUID!, $from_date: DateTime!) {
+              manager_create(
+                input: {person: $person, responsibility: $responsibility, org_unit: $org_unit, manager_level: $manager_level, manager_type: $manager_type, validity: {from: $from_date}}
+              ) {
+                uuid
+              }
+            }
+            """
+        )
+        variables: dict[str, object] = {
+            "person": person,
+            "responsibility": responsibility,
+            "org_unit": org_unit,
+            "manager_level": manager_level,
+            "manager_type": manager_type,
+            "from_date": from_date,
+        }
+        response = await self.execute(query=query, variables=variables)
+        data = self.get_data(response)
+        return TestingCreateManager.parse_obj(data).manager_create
+
+    async def _testing__create_org_unit(
+        self,
+        from_date: datetime,
+        name: str,
+        org_unit_type: UUID,
+        parent: Union[Optional[UUID], UnsetType] = UNSET,
+    ) -> TestingCreateOrgUnitOrgUnitCreate:
+        query = gql(
+            """
+            mutation _Testing_CreateOrgUnit($from_date: DateTime!, $name: String!, $org_unit_type: UUID!, $parent: UUID) {
+              org_unit_create(
+                input: {validity: {from: $from_date}, name: $name, org_unit_type: $org_unit_type, parent: $parent}
+              ) {
+                uuid
+              }
+            }
+            """
+        )
+        variables: dict[str, object] = {
+            "from_date": from_date,
+            "name": name,
+            "org_unit_type": org_unit_type,
+            "parent": parent,
+        }
+        response = await self.execute(query=query, variables=variables)
+        data = self.get_data(response)
+        return TestingCreateOrgUnit.parse_obj(data).org_unit_create
+
+    async def _testing__terminate_engagement(
+        self, uuid: UUID, to: datetime
+    ) -> TestingTerminateEngagementEngagementTerminate:
+        query = gql(
+            """
+            mutation _Testing_TerminateEngagement($uuid: UUID!, $to: DateTime!) {
+              engagement_terminate(input: {uuid: $uuid, to: $to}) {
+                uuid
+              }
+            }
+            """
+        )
+        variables: dict[str, object] = {"uuid": uuid, "to": to}
+        response = await self.execute(query=query, variables=variables)
+        data = self.get_data(response)
+        return TestingTerminateEngagement.parse_obj(data).engagement_terminate

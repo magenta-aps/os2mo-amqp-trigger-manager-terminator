@@ -1,3 +1,15 @@
+from ._testing__create_employee import TestingCreateEmployee
+from ._testing__create_employee import TestingCreateEmployeeEmployeeCreate
+from ._testing__create_engagement import TestingCreateEngagement
+from ._testing__create_engagement import TestingCreateEngagementEngagementCreate
+from ._testing__create_manager import TestingCreateManager
+from ._testing__create_manager import TestingCreateManagerManagerCreate
+from ._testing__create_org_unit import TestingCreateOrgUnit
+from ._testing__create_org_unit import TestingCreateOrgUnitOrgUnitCreate
+from ._testing__terminate_engagement import TestingTerminateEngagement
+from ._testing__terminate_engagement import (
+    TestingTerminateEngagementEngagementTerminate,
+)
 from .async_base_client import AsyncBaseClient
 from .base_model import BaseModel
 from .client import GraphQLClient
@@ -373,6 +385,16 @@ __all__ = [
     "RoleRegistrationFilter",
     "TerminateManager",
     "TerminateManagerManagerTerminate",
+    "TestingCreateEmployee",
+    "TestingCreateEmployeeEmployeeCreate",
+    "TestingCreateEngagement",
+    "TestingCreateEngagementEngagementCreate",
+    "TestingCreateManager",
+    "TestingCreateManagerManagerCreate",
+    "TestingCreateOrgUnit",
+    "TestingCreateOrgUnitOrgUnitCreate",
+    "TestingTerminateEngagement",
+    "TestingTerminateEngagementEngagementTerminate",
     "UpdateManager",
     "UpdateManagerManagerUpdate",
     "UuidsBoundClassFilter",
