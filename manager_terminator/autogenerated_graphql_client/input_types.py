@@ -1,11 +1,15 @@
 from datetime import datetime
-from typing import Any, List, Optional
+from typing import Any
+from typing import List
+from typing import Optional
 from uuid import UUID
 
 from pydantic import Field
 
 from .base_model import BaseModel
-from .enums import AccessLogModel, FileStore, OwnerInferencePriority
+from .enums import AccessLogModel
+from .enums import FileStore
+from .enums import OwnerInferencePriority
 
 
 class AccessLogFilter(BaseModel):

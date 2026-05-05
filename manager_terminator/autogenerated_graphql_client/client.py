@@ -1,21 +1,24 @@
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List
+from typing import Optional
+from typing import Union
 from uuid import UUID
 
 from .async_base_client import AsyncBaseClient
-from .base_model import UNSET, UnsetType
-from .get_employee_managers import GetEmployeeManagers, GetEmployeeManagersManagers
-from .get_engagement_objects import (
-    GetEngagementObjects,
-    GetEngagementObjectsEngagements,
-)
-from .get_engagement_objects_by_uuids import (
-    GetEngagementObjectsByUuids,
-    GetEngagementObjectsByUuidsEngagements,
-)
-from .get_managers import GetManagers, GetManagersManagers
-from .terminate_manager import TerminateManager, TerminateManagerManagerTerminate
-from .update_manager import UpdateManager, UpdateManagerManagerUpdate
+from .base_model import UNSET
+from .base_model import UnsetType
+from .get_employee_managers import GetEmployeeManagers
+from .get_employee_managers import GetEmployeeManagersManagers
+from .get_engagement_objects import GetEngagementObjects
+from .get_engagement_objects import GetEngagementObjectsEngagements
+from .get_engagement_objects_by_uuids import GetEngagementObjectsByUuids
+from .get_engagement_objects_by_uuids import GetEngagementObjectsByUuidsEngagements
+from .get_managers import GetManagers
+from .get_managers import GetManagersManagers
+from .terminate_manager import TerminateManager
+from .terminate_manager import TerminateManagerManagerTerminate
+from .update_manager import UpdateManager
+from .update_manager import UpdateManagerManagerUpdate
 
 
 def gql(q: str) -> str:
@@ -23,7 +26,6 @@ def gql(q: str) -> str:
 
 
 class GraphQLClient(AsyncBaseClient):
-
     async def get_managers(self) -> GetManagersManagers:
         query = gql(
             """
