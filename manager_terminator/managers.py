@@ -137,9 +137,7 @@ async def update_manager_to_vacant(
 
         if period.to is POSITIVE_INFINITY:
             update_args["vacant_to"] = None
-            update_args["vacant_from"] = (
-                period.from_ - datetime.timedelta(days=1)
-            ).date()
+            update_args["vacant_from"] = period.from_.date()
 
         try:
             updated_manager_periods.append(await mo.update_manager(**update_args))
