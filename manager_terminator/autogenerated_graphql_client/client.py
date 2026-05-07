@@ -232,12 +232,13 @@ class GraphQLClient(AsyncBaseClient):
         engagement_type: UUID,
         job_function: UUID,
         person: UUID,
+        to_date: Union[Optional[datetime], UnsetType] = UNSET,
     ) -> TestingCreateEngagementEngagementCreate:
         query = gql(
             """
-            mutation _Testing_CreateEngagement($from_date: DateTime!, $org_unit: UUID!, $engagement_type: UUID!, $job_function: UUID!, $person: UUID!) {
+            mutation _Testing_CreateEngagement($from_date: DateTime!, $to_date: DateTime, $org_unit: UUID!, $engagement_type: UUID!, $job_function: UUID!, $person: UUID!) {
               engagement_create(
-                input: {validity: {from: $from_date}, org_unit: $org_unit, engagement_type: $engagement_type, job_function: $job_function, person: $person}
+                input: {validity: {from: $from_date, to: $to_date}, org_unit: $org_unit, engagement_type: $engagement_type, job_function: $job_function, person: $person}
               ) {
                 uuid
               }
@@ -246,6 +247,7 @@ class GraphQLClient(AsyncBaseClient):
         )
         variables: dict[str, object] = {
             "from_date": from_date,
+            "to_date": to_date,
             "org_unit": org_unit,
             "engagement_type": engagement_type,
             "job_function": job_function,
