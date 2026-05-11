@@ -158,6 +158,7 @@ mutation _Testing_CreateEmployee($given_name: String!, $surname: String!) {
 
 mutation _Testing_CreateEngagement(
   $from_date: DateTime!
+  $to_date: DateTime
   $org_unit: UUID!
   $engagement_type: UUID!
   $job_function: UUID!
@@ -165,7 +166,7 @@ mutation _Testing_CreateEngagement(
 ) {
   engagement_create(
     input: {
-      validity: { from: $from_date }
+      validity: { from: $from_date, to: $to_date }
       org_unit: $org_unit
       engagement_type: $engagement_type
       job_function: $job_function
