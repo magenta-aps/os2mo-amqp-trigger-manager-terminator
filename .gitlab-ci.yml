@@ -8,7 +8,6 @@ stages:
   - release
   - deploy
 
-
 variables:
   IMAGE_SHA: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
 
@@ -24,17 +23,16 @@ variables:
   PRODUCT: os2mo
   COMPONENT: manager-terminator
 
-
 # Conditions
 #############
 .if-default-branch-refs: &if-default-branch-refs
-  if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
 
 .if-tag: &if-tag
-  if: '$CI_COMMIT_TAG'
+  if: "$CI_COMMIT_TAG"
 
 .if-merge-request: &if-merge-request
-  if: '$CI_MERGE_REQUEST_IID'
+  if: "$CI_MERGE_REQUEST_IID"
 
 # Workflow
 ###########
@@ -44,14 +42,26 @@ workflow:
     - <<: *if-default-branch-refs
     - <<: *if-merge-request
 
-
 include:
+  - project: rammearkitektur/os2mo
+    file:
+      - gitlab-ci-templates/integration-test-meta.v1.yml
   - project: labs/salt-automation
     file:
-    - gitlab-ci-templates/common/config-updater-flux.v1.yml
-    - gitlab-ci-templates/common/config-updater-salt.v1.yml
-    - gitlab-ci-templates/common/conventional-commits.v1.yml
-    - gitlab-ci-templates/common/docker-build.v1.yml
-    - gitlab-ci-templates/common/docker-release.v1.yml
-    - gitlab-ci-templates/common/pre-commit.v1.yml
-    - gitlab-ci-templates/python/pytest.v1.yml
+      - gitlab-ci-templates/common/config-updater-flux.v1.yml
+      - gitlab-ci-templates/common/config-updater-salt.v1.yml
+      - gitlab-ci-templates/common/conventional-commits.v1.yml
+      - gitlab-ci-templates/common/docker-build.v1.yml
+      - gitlab-ci-templates/common/docker-release.v1.yml
+      - gitlab-ci-templates/common/pre-commit.v1.yml
+      - gitlab-ci-templates/python/pytest.v1.yml
+
+Test:
+  variables:
+    PYTEST_ADDOPTS: "-m 'not integration_test'"
+
+Integration-test:
+  extends:
+    - .integration-test:mo
+  rules:
+    - <<: *if-merge-request

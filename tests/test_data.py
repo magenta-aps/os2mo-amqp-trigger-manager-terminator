@@ -3,9 +3,10 @@
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
+from typing import Any
 from uuid import UUID
 
-NO_ENGAGEMENT_OBJECTS_FOUND = {"objects": []}
+NO_ENGAGEMENT_OBJECTS_FOUND: dict[str, list[dict[str, Any]]] = {"objects": []}
 
 ENGAGEMENT_OBJECTS = {
     "objects": [

@@ -3,7 +3,15 @@
 services:
   terminator:
     build: .
-    command: ["uvicorn", "--factory", "manager_terminator.main:create_app", "--host", "0.0.0.0", "--reload"]
+    command:
+      [
+        "uvicorn",
+        "--factory",
+        "manager_terminator.main:create_app",
+        "--host",
+        "0.0.0.0",
+        "--reload",
+      ]
     environment:
       LOG_LEVEL: DEBUG
       MANAGER_TERMINATOR__LOG_LEVEL: DEBUG
@@ -13,12 +21,30 @@ services:
       FASTRAMQPI__AUTH_SERVER: "http://keycloak:8080/auth"
       FASTRAMQPI__CLIENT_ID: "dipex"
       FASTRAMQPI__CLIENT_SECRET: "603f1c82-d012-4d04-9382-dbe659c533fb"
+
+      # these are needed because FastRAMQPI assumes all integrations have a database
+      FASTRAMQPI__DATABASE__USER: "fastramqpi"
+      FASTRAMQPI__DATABASE__PASSWORD: "fastramqpi"
+      FASTRAMQPI__DATABASE__HOST: "db"
+      FASTRAMQPI__DATABASE__NAME: "fastramqpi"
+
     networks:
       - os2mo_default
+      - default
     volumes:
       - ./manager_terminator:/app/manager_terminator
     ports:
       - "127.0.0.1:8000:8000"
+
+  # this database is needed because FastRAMQPI assumes all integrations have a database
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: "fastramqpi"
+      POSTGRES_PASSWORD: "fastramqpi"
+      POSTGRES_DB: "fastramqpi"
+    networks:
+      - default
 
 networks:
   os2mo_default:
