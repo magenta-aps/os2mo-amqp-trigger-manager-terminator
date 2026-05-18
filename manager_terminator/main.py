@@ -78,7 +78,7 @@ def create_app() -> FastAPI:
     fastramqpi = FastRAMQPI(
         application_name="os2mo-manager-terminator",
         settings=settings.fastramqpi,
-        graphql_version=25,
+        graphql_version=29,
         graphql_client_cls=GraphQLClient,
         graphql_events=GraphQLEvents(
             declare_listeners=[
