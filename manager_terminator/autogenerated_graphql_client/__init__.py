@@ -10,6 +10,8 @@ from ._testing__terminate_engagement import TestingTerminateEngagement
 from ._testing__terminate_engagement import (
     TestingTerminateEngagementEngagementTerminate,
 )
+from ._testing__update_manager import TestingUpdateManager
+from ._testing__update_manager import TestingUpdateManagerManagerUpdate
 from .async_base_client import AsyncBaseClient
 from .base_model import BaseModel
 from .client import GraphQLClient
@@ -395,6 +397,8 @@ __all__ = [
     "TestingCreateOrgUnitOrgUnitCreate",
     "TestingTerminateEngagement",
     "TestingTerminateEngagementEngagementTerminate",
+    "TestingUpdateManager",
+    "TestingUpdateManagerManagerUpdate",
     "UpdateManager",
     "UpdateManagerManagerUpdate",
     "UuidsBoundClassFilter",
