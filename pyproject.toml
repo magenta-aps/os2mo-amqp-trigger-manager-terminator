@@ -11,7 +11,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 structlog = "^25"
-fastramqpi = "^12"
+fastramqpi = "^14"
 fastapi = "^0.115"
 starlette = "^0.41"
 uvicorn = "^0.34"
