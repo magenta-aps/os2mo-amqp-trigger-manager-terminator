@@ -97,7 +97,6 @@ from .input_types import ClassOwnerFilter
 from .input_types import ClassRegistrationFilter
 from .input_types import ClassTerminateInput
 from .input_types import ClassUpdateInput
-from .input_types import ConfigurationFilter
 from .input_types import DescendantParentBoundOrganisationUnitFilter
 from .input_types import EmployeeCreateInput
 from .input_types import EmployeeFilter
@@ -110,6 +109,7 @@ from .input_types import EmployeesBoundLeaveFilter
 from .input_types import EmployeesBoundManagerFilter
 from .input_types import EmployeeTerminateInput
 from .input_types import EmployeeUpdateInput
+from .input_types import EngagementBoundAddressFilter
 from .input_types import EngagementBoundITUserFilter
 from .input_types import EngagementCreateInput
 from .input_types import EngagementFilter
@@ -238,7 +238,6 @@ __all__ = [
     "ClassRegistrationFilter",
     "ClassTerminateInput",
     "ClassUpdateInput",
-    "ConfigurationFilter",
     "DescendantParentBoundOrganisationUnitFilter",
     "EmployeeCreateInput",
     "EmployeeFilter",
@@ -251,6 +250,7 @@ __all__ = [
     "EmployeesBoundITUserFilter",
     "EmployeesBoundLeaveFilter",
     "EmployeesBoundManagerFilter",
+    "EngagementBoundAddressFilter",
     "EngagementBoundITUserFilter",
     "EngagementCreateInput",
     "EngagementFilter",
