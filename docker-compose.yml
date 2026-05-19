@@ -33,6 +33,7 @@ services:
       - default
     volumes:
       - ./:/app/:ro
+      - ./.coverage-data/:/app/.coverage-data/
     ports:
       - "127.0.0.1:8000:8000"
 
