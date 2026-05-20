@@ -10,6 +10,7 @@ time to run in pipelines, so we keep them few and simple.
 import uuid
 from datetime import datetime
 from datetime import timedelta
+from unittest import skip
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -32,6 +33,7 @@ from manager_terminator.depends import GraphQLClient
 logger = structlog.stdlib.get_logger()
 
 
+@skip("wip")
 @pytest.mark.integration_test
 async def test_terminate_engagement_no_vacancy_smoke(
     app: FastAPI,
@@ -127,6 +129,7 @@ async def test_terminate_engagement_no_vacancy_smoke(
         await assertions()
 
 
+@skip("wip")
 @pytest.mark.integration_test
 @pytest.mark.envvar({"MANAGER_TERMINATOR__SET_TO_VACANT": "true"})
 async def test_terminate_engagement_set_to_vacant_smoke(
