@@ -83,6 +83,7 @@ async def invalid_manager_periods(
     all_invalid_periods = []
     for manager in managers:
         for manager_obj in manager.validities:
+            logger.warn("processing manager object", manager_obj=manager_obj)
             valid_engagement_validities = [
                 engagement.validity
                 for manager_employee in manager_obj.person or []
@@ -93,6 +94,7 @@ async def invalid_manager_periods(
                 _find_gaps(manager_obj, valid_engagement_validities)
             )
 
+    logger.warn("found invalid periods", invalid_periods=all_invalid_periods)
     return all_invalid_periods
 
 
@@ -109,7 +111,6 @@ async def terminate_manager_periods(
         if period.to is POSITIVE_INFINITY:
             terminate_args["terminate_from"] = None
             terminate_args["terminate_to"] = period.from_.date()
-
         try:
             terminated_manager_periods.append(
                 await mo.terminate_manager(**terminate_args)

@@ -7,7 +7,6 @@ These tests exercise the integration's temporal logic.
 
 import uuid
 from datetime import datetime
-from unittest import skip
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -244,12 +243,11 @@ async def test_idempotent_vacancy(
             manager_type=uuid.uuid4(),
         )
     )
-    manager_uuid = vacant_manager.uuid
+    vacant_manager_uuid = vacant_manager.uuid
 
     # create a second validity [t4, t5] on the same manager as a sentinel
-    await graphql_client._testing__create_manager(
+    sentinel_manager = await graphql_client._testing__create_manager(
         ManagerCreateInput(
-            uuid=manager_uuid,
             validity=RAValidityInput(from_=t4, to=t5),
             person=default_employee.uuid,
             responsibility=[uuid.uuid4()],
@@ -258,6 +256,7 @@ async def test_idempotent_vacancy(
             manager_type=uuid.uuid4(),
         )
     )
+    sentinel_manager_uuid = sentinel_manager.uuid
 
     # Act
 
@@ -269,7 +268,7 @@ async def test_idempotent_vacancy(
     async def verify() -> None:
         managers = await graphql_client.get_managers(
             filter=ManagerFilter(
-                uuids=[manager_uuid],
+                uuids=[vacant_manager_uuid, sentinel_manager_uuid],
                 from_date=None,
                 to_date=None,
             )
@@ -284,7 +283,6 @@ async def test_idempotent_vacancy(
     await verify()
 
 
-@skip("todo")
 @pytest.mark.integration_test
 async def test_overlap_patterns(
     test_client: AsyncClient,
@@ -411,7 +409,6 @@ async def test_overlap_patterns(
     await verify()
 
 
-@skip("todo")
 @pytest.mark.integration_test
 async def test_touching_validities(
     test_client: AsyncClient,
