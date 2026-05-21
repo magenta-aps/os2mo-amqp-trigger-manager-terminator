@@ -40,7 +40,7 @@ async def initiate_terminator(
     """
 
     manager_objects = await managers.get(mo)
-    manager_invalid_periods = await managers.invalid_manager_periods(manager_objects)
+    manager_invalid_periods = managers.invalid_manager_periods(manager_objects)
     if len(manager_invalid_periods) < 1:
         logger.info("No invalid manager periods found.")
         return
