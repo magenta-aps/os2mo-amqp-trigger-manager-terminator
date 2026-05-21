@@ -48,9 +48,7 @@ async def engagement_event_handler(
         return
 
     # Find invalid manager periods
-    manager_invalid_periods = await managers.invalid_manager_periods(
-        employee_manager_objects
-    )
+    manager_invalid_periods = managers.invalid_manager_periods(employee_manager_objects)
     if len(manager_invalid_periods) < 1:
         logger.info("No invalid manager periods found.")
         return
