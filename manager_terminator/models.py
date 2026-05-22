@@ -32,7 +32,7 @@ class InvalidManagerPeriod(BaseModel):
 
 
 # Copied from: https://git.magenta.dk/rammearkitektur/os2mo-sdtool-plus/-/blob/918492e69de0a093bb96c5e825235c4017cc7aa7/sdtoolplus/models.py#L184
-class Interval(GenericModel, Generic[V], frozen=True):
+class Interval(GenericModel, Generic[V]):
     """
     Interval conventions:
     1) 'start' is included in the interval, but 'end' is not
@@ -44,6 +44,9 @@ class Interval(GenericModel, Generic[V], frozen=True):
     start: datetime
     end: datetime
     value: V
+
+    class Config:
+        allow_mutation = False
 
     @root_validator
     def ensure_timezones(cls, values: dict[str, Any]) -> dict[str, Any]:
@@ -72,8 +75,11 @@ class Active(Interval[bool]):
 
 
 # Copied from: https://git.magenta.dk/rammearkitektur/os2mo-sdtool-plus/-/blob/918492e69de0a093bb96c5e825235c4017cc7aa7/sdtoolplus/models.py#L301
-class Timeline(GenericModel, Generic[T], frozen=True):
+class Timeline(GenericModel, Generic[T]):
     intervals: tuple[T, ...] = tuple()
+
+    class Config:
+        allow_mutation = False
 
     @validator("intervals")
     def entities_must_be_same_type(cls, v):
