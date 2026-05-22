@@ -1,12 +1,12 @@
 # SPDX-FileCopyrightText: 2023 Magenta ApS <https://magenta.dk>
 # SPDX-License-Identifier: MPL-2.0
 from datetime import datetime
+from datetime import tzinfo
 from itertools import pairwise
 from typing import Any
 from typing import Generic
 from typing import TypeVar
 from uuid import UUID
-from zoneinfo import ZoneInfo
 
 from more_itertools import collapse
 from more_itertools import first
@@ -52,9 +52,10 @@ class Interval(GenericModel, Generic[V]):
     def ensure_timezones(cls, values: dict[str, Any]) -> dict[str, Any]:
         start = values["start"]
         end = values["end"]
-        if not (
-            isinstance(start.tzinfo, ZoneInfo) and isinstance(end.tzinfo, ZoneInfo)
-        ):
+        # both datetime.UTC and zoneinfo.ZoneInfo are different types (because
+        # of Python jank) but they both inherit from tzinfo, so this should find
+        # both kinds of timezones
+        if not (isinstance(start.tzinfo, tzinfo) and isinstance(end.tzinfo, tzinfo)):
             raise ValueError("Timezone must be provided")
         return values
 
