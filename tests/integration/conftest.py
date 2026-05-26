@@ -30,7 +30,7 @@ async def app(monkeypatch: MonkeyPatch) -> FastAPI:
 @pytest.fixture
 async def graphql_client(mo_client: AsyncClient) -> AsyncIterator[GraphQLClient]:
     graphql_client = GraphQLClient(
-        url=f"{mo_client.base_url}/graphql/v22", http_client=mo_client
+        url=f"{mo_client.base_url}/graphql/v29", http_client=mo_client
     )
     async with graphql_client as client:
         yield client

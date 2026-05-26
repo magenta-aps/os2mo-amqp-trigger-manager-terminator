@@ -32,7 +32,7 @@ services:
       - os2mo_default
       - default
     volumes:
-      - ./manager_terminator:/app/manager_terminator
+      - ./:/app/:ro
     ports:
       - "127.0.0.1:8000:8000"
 

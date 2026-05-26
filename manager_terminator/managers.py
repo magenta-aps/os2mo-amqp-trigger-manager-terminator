@@ -1,6 +1,5 @@
 # SPDX-FileCopyrightText: 2023 Magenta ApS <https://magenta.dk>
 # SPDX-License-Identifier: MPL-2.0
-import datetime
 import json
 from typing import Any
 from uuid import UUID
@@ -106,9 +105,7 @@ async def terminate_manager_periods(
         }
         if period.to is POSITIVE_INFINITY:
             terminate_args["terminate_from"] = None
-            terminate_args["terminate_to"] = (
-                period.from_ - datetime.timedelta(days=1)
-            ).date()
+            terminate_args["terminate_to"] = period.from_.date()
 
         try:
             terminated_manager_periods.append(
@@ -185,7 +182,7 @@ def _find_gaps(
 
     # Check for the gap before the first period
     if manager.validity.from_ < engagement_validities[0].from_:
-        gap_end_date = engagement_validities[0].from_ - datetime.timedelta(days=1)
+        gap_end_date = engagement_validities[0].from_
         gaps.append(
             InvalidManagerPeriod(
                 uuid=manager.uuid,
@@ -208,19 +205,13 @@ def _find_gaps(
         # Check for a gap
         assert current_end_date is not None
         if current_end_date < next_start_date:
-            invalid_from = current_end_date + datetime.timedelta(days=1)
+            invalid_from = current_end_date
 
             # Don't create a gap if it starts after the manager ends
             if invalid_from > manager_end_date:
                 continue
 
-            invalid_to = min(
-                next_start_date - datetime.timedelta(days=1), manager_end_date
-            )
-
-            if invalid_to < invalid_from:
-                # Happens when engagements are tightly aligned (no real gap)
-                continue
+            invalid_to = min(next_start_date, manager_end_date)
 
             gaps.append(
                 InvalidManagerPeriod(
@@ -236,14 +227,11 @@ def _find_gaps(
     if not engagements_have_to_date_none:
         last_period_end_date = engagement_validities[-1].to
         # Only consider a gap if the last engagement ends *before* the manager does
-        if (
-            last_period_end_date
-            and last_period_end_date + datetime.timedelta(days=1) <= manager_end_date
-        ):
+        if last_period_end_date and last_period_end_date <= manager_end_date:
             gaps.append(
                 InvalidManagerPeriod(
                     uuid=manager.uuid,
-                    from_=last_period_end_date + datetime.timedelta(days=1),
+                    from_=last_period_end_date,
                     to=manager_end_date,
                 )
             )

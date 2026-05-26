@@ -9,7 +9,6 @@ time to run in pipelines, so we keep them few and simple.
 
 import uuid
 from datetime import datetime
-from datetime import timedelta
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -215,18 +214,18 @@ async def test_terminate_engagement_set_to_vacant_smoke(
                 )
             )
 
-            # assert manager has two validities [t1, t2] and [t2+1, ...)
+            # assert manager has two validities [t1, t2] and [t2, ...)
             manager_obj = one(managers.objects)
             validities = manager_obj.validities
             validity_1 = validities[0].validity
             validity_2 = validities[1].validity
             assert validity_1.from_ == t1
             assert validity_1.to == t2
-            assert validity_2.from_ == t2 + timedelta(days=1)
+            assert validity_2.from_ == t2
             assert validity_2.to is None
             assert len(validities) == 2
 
-            # assert manager person is set in [t1, t2], and null in [t2+1, ...)
+            # assert manager person is set in [t1, t2], and null in [t2, ...)
             assert validities[0].person is not None
             person_1 = one(validities[0].person)
             person_engagement = one(person_1.engagements)
