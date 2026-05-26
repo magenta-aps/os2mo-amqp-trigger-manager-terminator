@@ -148,3 +148,9 @@ mutation _Testing_TerminateEngagement($uuid: UUID!, $to: DateTime!) {
     uuid
   }
 }
+
+mutation _Testing_UpdateManager($input: ManagerUpdateInput!) {
+  manager_update(input: $input) {
+    uuid
+  }
+}
