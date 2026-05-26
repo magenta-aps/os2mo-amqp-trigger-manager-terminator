@@ -16,6 +16,7 @@ from manager_terminator.exceptions import NoValueError
 from manager_terminator.models import Active
 from manager_terminator.models import Timeline
 from manager_terminator.models import combine_intervals
+from manager_terminator.models import merge_overlapping_intervals
 
 TZ = ZoneInfo("Europe/London")
 TODAY_START = datetime.combine(datetime.now(), time.min, tzinfo=TZ)
@@ -113,6 +114,89 @@ def test_combine_intervals_single_input():
 
     # Assert
     assert condensed == intervals
+
+
+def test_merge_overlapping_intervals():
+    """
+    ```
+            t1....t2....t3.......t4....t5....t6.......t7....t8
+    Input:  |-----v1----|              |---------v1---------|
+                  |-----v2-------|           |---v2---|
+    Output: |-----v1----|---v2---|     |---------v1---------|
+    ```
+    """
+    # Arrange
+    t1 = datetime(2001, 1, 1, tzinfo=TZ)
+    t2 = datetime(2002, 1, 1, tzinfo=TZ)
+    t3 = datetime(2003, 1, 1, tzinfo=TZ)
+    t4 = datetime(2004, 1, 1, tzinfo=TZ)
+    t5 = datetime(2005, 1, 1, tzinfo=TZ)
+    t6 = datetime(2006, 1, 1, tzinfo=TZ)
+    t7 = datetime(2007, 1, 1, tzinfo=TZ)
+    t8 = datetime(2008, 1, 1, tzinfo=TZ)
+
+    intervals = (
+        Active(start=t1, end=t3, value=True),
+        Active(start=t2, end=t4, value=False),
+        Active(start=t5, end=t8, value=True),
+        Active(start=t6, end=t7, value=False),
+    )
+
+    # Act
+    merged = merge_overlapping_intervals(intervals)
+
+    # Assert
+    assert merged == (
+        Active(start=t1, end=t3, value=True),
+        Active(start=t3, end=t4, value=False),
+        Active(start=t5, end=t8, value=True),
+    )
+
+
+def test_merge_overlapping_intervals_contiguous():
+    """
+    ```
+            t1....t2....t3....t4
+    Input:  |-----v1----|
+                  |-----v1----|
+    Output: |--------v1-------|
+    ```
+    """
+    # Arrange
+    t1 = datetime(2001, 1, 1, tzinfo=TZ)
+    t2 = datetime(2002, 1, 1, tzinfo=TZ)
+    t3 = datetime(2003, 1, 1, tzinfo=TZ)
+    t4 = datetime(2004, 1, 1, tzinfo=TZ)
+
+    intervals = (
+        Active(start=t1, end=t3, value=True),
+        Active(start=t2, end=t4, value=True),
+    )
+
+    # Act
+    merged = merge_overlapping_intervals(intervals)
+
+    # Assert
+    assert merged == (Active(start=t1, end=t4, value=True),)
+
+
+def test_merge_overlapping_intervals_empty_input():
+    # Act
+    merged = merge_overlapping_intervals(tuple())
+
+    # Assert
+    assert merged == tuple()
+
+
+def test_merge_overlapping_intervals_single_input():
+    # Arrange
+    intervals = (Active(start=MINUS_INFINITY, end=INFINITY, value=True),)
+
+    # Act
+    merged = merge_overlapping_intervals(intervals)
+
+    # Assert
+    assert merged == intervals
 
 
 def test_timeline_can_be_instantiated_correctly():

@@ -2,12 +2,15 @@
 # SPDX-License-Identifier: MPL-2.0
 from datetime import datetime
 from datetime import tzinfo
+from enum import IntEnum
 from itertools import pairwise
 from typing import Any
 from typing import Generic
+from typing import Self
 from typing import TypeVar
 from uuid import UUID
 
+import structlog
 from more_itertools import collapse
 from more_itertools import first
 from more_itertools import last
@@ -19,6 +22,8 @@ from pydantic import validator
 from pydantic.generics import GenericModel
 
 from manager_terminator.exceptions import NoValueError
+
+logger = structlog.stdlib.get_logger()
 
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S.%f (%Z)"
 
@@ -56,8 +61,16 @@ class Interval(GenericModel, Generic[V]):
         # of Python jank) but they both inherit from tzinfo, so this should find
         # both kinds of timezones
         if not (isinstance(start.tzinfo, tzinfo) and isinstance(end.tzinfo, tzinfo)):
+            logger.error("invalid timezone", start=start, end=end)
             raise ValueError("Timezone must be provided")
         return values
+
+    def with_start(self, new_start: datetime) -> Self:
+        """Returns a copy of self with a new start point"""
+
+        # this is better than using `.copy`, because it runs pydantic validators
+        # again, whereas `.copy` bypasses them, hiding a potential footgun
+        return type(self)(start=new_start, end=self.end, value=self.value)
 
     def __repr__(self):
         return (
@@ -72,6 +85,20 @@ T = TypeVar("T", bound=Interval)
 
 
 class Active(Interval[bool]):
+    pass
+
+
+class ManagerStatus(IntEnum):
+    VACANT = 1
+    ACTIVE = 2
+
+
+class ManagerValue(BaseModel):
+    uuid: UUID
+    status: ManagerStatus
+
+
+class Manager(Interval[ManagerValue]):
     pass
 
 
@@ -161,3 +188,54 @@ def combine_intervals(intervals: tuple[T, ...]) -> tuple[T, ...]:
     return tuple(
         first(group).copy(update={"end": last(group).end}) for group in interval_groups
     )
+
+
+def merge_overlapping_intervals(intervals: tuple[T, ...]) -> tuple[T, ...]:
+    """
+    Merge intervals with overlapping timestamps, by picking one of them arbitrarily.
+
+    Intervals must be sorted by start time. For each overlap, the
+    earlier-starting interval keeps its range, and the later interval's start
+    is moved forward to the earlier interval's end. Intervals that become
+    fully consumed (zero or negative length) are dropped.
+
+    Example:
+    ```
+        |---v1---|
+             |------v2----|
+
+        |---v1---|---v2---|
+    ```
+    """
+    if not all(i1.start <= i2.start for i1, i2 in pairwise(intervals)):
+        raise ValueError("intervals must be sorted by start time")
+
+    merged = []
+
+    # we move the watermark forward when we put something in `merged`, so anything
+    # before the watermark is already merged
+    watermark: datetime | None = None
+
+    for interval in intervals:
+        if watermark is None:
+            new_start = interval.start
+        else:
+            # any intervals following whatever we last merged get trimmed if they
+            # overlap with the watermark
+            new_start = max(interval.start, watermark)
+
+        if new_start >= interval.end:
+            # zero or negative-size intervals are dropped
+            continue
+        merged.append(interval.with_start(new_start))
+
+        if watermark is None:
+            watermark = interval.end
+        else:
+            # when we merge an interval, we push the watermark to its end, so any
+            # future overlapping intervals get lower priority
+            watermark = max(watermark, interval.end)
+
+    # after merging, there might now be adjacent identical intervals that have
+    # to be combined
+    return combine_intervals(tuple(merged))
