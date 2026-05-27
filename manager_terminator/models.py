@@ -60,7 +60,7 @@ class Interval(GenericModel, Generic[V]):
         # both datetime.UTC and zoneinfo.ZoneInfo are different types (because
         # of Python jank) but they both inherit from tzinfo, so this should find
         # both kinds of timezones
-        if not (isinstance(start.tzinfo, tzinfo) and isinstance(end.tzinfo, tzinfo)):
+        if not (isinstance(start.tzinfo, tzinfo) and isinstance(end.tzinfo, tzinfo)):  # pragma: no cover
             logger.error("invalid timezone", start=start, end=end)
             raise ValueError("Timezone must be provided")
         return values
@@ -72,7 +72,7 @@ class Interval(GenericModel, Generic[V]):
         # again, whereas `.copy` bypasses them, hiding a potential footgun
         return type(self)(start=new_start, end=self.end, value=self.value)
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return (
             f"{self.__class__.__name__}("
             f"start={self.start.strftime(DATETIME_FORMAT)}, "
@@ -113,7 +113,7 @@ class Timeline(GenericModel, Generic[T]):
     def entities_must_be_same_type(cls, v):
         if len(v) == 0:
             return v
-        if not all(isinstance(entity, type(first(v))) for entity in v):
+        if not all(isinstance(entity, type(first(v))) for entity in v):  # pragma: no cover
             raise ValueError("Entities must be of the same type")
         return v
 
