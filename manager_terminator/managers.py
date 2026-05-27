@@ -32,17 +32,6 @@ from manager_terminator.utils import POSITIVE_INFINITY
 logger = structlog.get_logger(__name__)
 
 
-async def get(mo: GraphQLClient) -> list[GetManagersManagersObjects]:
-    """Fetches all manager objects from MO using GraphQL.
-
-    Note: The GraphQL query fetches "objects" and not "current", since we want to examine
-    all manager objects, even if they are not currently active.
-    """
-
-    gql_response = await mo.get_managers(ManagerFilter(from_date=None, to_date=None))
-    return gql_response.objects
-
-
 async def get_by_employee_uuids(
     mo: GraphQLClient, employee_uuids: list[UUID]
 ) -> list[GetManagersManagersObjects]:
