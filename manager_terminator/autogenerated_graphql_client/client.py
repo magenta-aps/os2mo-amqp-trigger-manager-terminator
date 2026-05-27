@@ -21,8 +21,6 @@ from ._testing__update_manager import TestingUpdateManagerManagerUpdate
 from .async_base_client import AsyncBaseClient
 from .base_model import UNSET
 from .base_model import UnsetType
-from .get_engagement_objects import GetEngagementObjects
-from .get_engagement_objects import GetEngagementObjectsEngagements
 from .get_engagement_objects_by_uuids import GetEngagementObjectsByUuids
 from .get_engagement_objects_by_uuids import GetEngagementObjectsByUuidsEngagements
 from .get_managers import GetManagers
@@ -127,54 +125,6 @@ class GraphQLClient(AsyncBaseClient):
         response = await self.execute(query=query, variables=variables)
         data = self.get_data(response)
         return UpdateManager.parse_obj(data).manager_update
-
-    async def get_engagement_objects(
-        self, engagement_uuid: UUID
-    ) -> GetEngagementObjectsEngagements:
-        query = gql("""
-            query GetEngagementObjects($engagement_uuid: UUID!) {
-              engagements(filter: {uuids: [$engagement_uuid]}) {
-                objects {
-                  validities {
-                    org_unit {
-                      uuid
-                    }
-                    validity {
-                      from
-                      to
-                    }
-                    person {
-                      uuid
-                      engagements(filter: {from_date: null, to_date: null}) {
-                        uuid
-                        org_unit {
-                          uuid
-                        }
-                        validity {
-                          from
-                          to
-                        }
-                      }
-                      manager_roles {
-                        uuid
-                        org_unit {
-                          uuid
-                        }
-                        validity {
-                          from
-                          to
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            """)
-        variables: dict[str, object] = {"engagement_uuid": engagement_uuid}
-        response = await self.execute(query=query, variables=variables)
-        data = self.get_data(response)
-        return GetEngagementObjects.parse_obj(data).engagements
 
     async def get_engagement_objects_by_uuids(
         self, engagement_uuids: List[UUID]
