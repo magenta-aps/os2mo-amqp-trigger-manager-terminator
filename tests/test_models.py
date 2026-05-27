@@ -296,6 +296,10 @@ def test_timeline_can_be_instantiated_correctly():
     assert Timeline[Active](intervals=(active1, active2))
 
 
+def test_timeline_can_be_empty():
+    assert Timeline[Active](intervals=()).intervals == ()
+
+
 def test_timeline_entities_must_be_intervals():
     with pytest.raises(ValueError):
         Timeline[str](intervals=("Not interval", "Not interval"))
