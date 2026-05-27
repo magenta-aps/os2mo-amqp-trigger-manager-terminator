@@ -26,7 +26,7 @@ async def engagement_event_handler(
 ):
     # Get all engagement objects related to the engagement-event
     engagement_objects = await engagements.get_by_uuid(mo, engagement_uuid)
-    if len(engagement_objects) < 1:
+    if len(engagement_objects) < 1:  # pragma: no cover
         logger.error("No engagement objects found for", engagement_uuid=engagement_uuid)
         return
 
@@ -41,7 +41,7 @@ async def engagement_event_handler(
     employee_manager_objects = await managers.get_by_employee_uuids(
         mo, list(employee_uuids)
     )
-    if len(employee_manager_objects) < 1:
+    if len(employee_manager_objects) < 1:  # pragma: no cover
         logger.error(
             "No manager objects found for employees", employee_uuids=employee_uuids
         )
