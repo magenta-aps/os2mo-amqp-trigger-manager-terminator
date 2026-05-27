@@ -58,45 +58,6 @@ mutation UpdateManager(
   }
 }
 
-query GetEngagementObjects($engagement_uuid: UUID!) {
-  engagements(filter: { uuids: [$engagement_uuid] }) {
-    objects {
-      validities {
-        org_unit {
-          uuid
-        }
-        validity {
-          from
-          to
-        }
-        person {
-          uuid
-          engagements(filter: { from_date: null, to_date: null }) {
-            uuid
-            org_unit {
-              uuid
-            }
-            validity {
-              from
-              to
-            }
-          }
-          manager_roles {
-            uuid
-            org_unit {
-              uuid
-            }
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
 query GetEngagementObjectsByUuids($engagement_uuids: [UUID!]!) {
   engagements(
     filter: { uuids: $engagement_uuids, from_date: null, to_date: null }
