@@ -24,37 +24,6 @@ from .exceptions import GraphQLClientGraphQLError
 from .exceptions import GraphQLClientGraphQLMultiError
 from .exceptions import GraphQLClientHttpError
 from .exceptions import GraphQlClientInvalidResponseError
-from .get_engagement_objects import GetEngagementObjects
-from .get_engagement_objects import GetEngagementObjectsEngagements
-from .get_engagement_objects import GetEngagementObjectsEngagementsObjects
-from .get_engagement_objects import GetEngagementObjectsEngagementsObjectsValidities
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesOrgUnit,
-)
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesPerson,
-)
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesPersonEngagements,
-)
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesPersonEngagementsOrgUnit,
-)
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesPersonEngagementsValidity,
-)
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesPersonManagerRoles,
-)
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesPersonManagerRolesOrgUnit,
-)
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesPersonManagerRolesValidity,
-)
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesValidity,
-)
 from .get_engagement_objects_by_uuids import GetEngagementObjectsByUuids
 from .get_engagement_objects_by_uuids import GetEngagementObjectsByUuidsEngagements
 from .get_engagement_objects_by_uuids import (
@@ -273,7 +242,6 @@ __all__ = [
     "FileFilter",
     "FileStore",
     "FullEventFilter",
-    "GetEngagementObjects",
     "GetEngagementObjectsByUuids",
     "GetEngagementObjectsByUuidsEngagements",
     "GetEngagementObjectsByUuidsEngagementsObjects",
@@ -281,18 +249,6 @@ __all__ = [
     "GetEngagementObjectsByUuidsEngagementsObjectsValiditiesOrgUnit",
     "GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPerson",
     "GetEngagementObjectsByUuidsEngagementsObjectsValiditiesValidity",
-    "GetEngagementObjectsEngagements",
-    "GetEngagementObjectsEngagementsObjects",
-    "GetEngagementObjectsEngagementsObjectsValidities",
-    "GetEngagementObjectsEngagementsObjectsValiditiesOrgUnit",
-    "GetEngagementObjectsEngagementsObjectsValiditiesPerson",
-    "GetEngagementObjectsEngagementsObjectsValiditiesPersonEngagements",
-    "GetEngagementObjectsEngagementsObjectsValiditiesPersonEngagementsOrgUnit",
-    "GetEngagementObjectsEngagementsObjectsValiditiesPersonEngagementsValidity",
-    "GetEngagementObjectsEngagementsObjectsValiditiesPersonManagerRoles",
-    "GetEngagementObjectsEngagementsObjectsValiditiesPersonManagerRolesOrgUnit",
-    "GetEngagementObjectsEngagementsObjectsValiditiesPersonManagerRolesValidity",
-    "GetEngagementObjectsEngagementsObjectsValiditiesValidity",
     "GetManagers",
     "GetManagersManagers",
     "GetManagersManagersObjects",
