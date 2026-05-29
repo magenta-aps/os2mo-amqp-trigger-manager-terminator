@@ -199,6 +199,94 @@ def test_merge_overlapping_intervals_single_input():
     assert merged == intervals
 
 
+def test_merge_overlapping_intervals_chain_consumed():
+    """
+    A third interval that is fully covered by the trimmed second interval
+    must be dropped, not crash or be appended out-of-order.
+
+    ```
+            t1....t2....t3....t4....t5
+    Input:  |-----v1----|
+                  |--------v2-------|
+                        |---v3-|
+    Output: |-----v1----|------v2---|
+    ```
+    """
+    # Arrange
+    t1 = datetime(2001, 1, 1, tzinfo=TZ)
+    t2 = datetime(2002, 1, 1, tzinfo=TZ)
+    t3 = datetime(2003, 1, 1, tzinfo=TZ)
+    t4 = datetime(2004, 1, 1, tzinfo=TZ)
+    t5 = datetime(2005, 1, 1, tzinfo=TZ)
+
+    intervals = (
+        Active(start=t1, end=t3, value=True),
+        Active(start=t2, end=t5, value=False),
+        Active(start=t3, end=t4, value=True),
+    )
+
+    # Act
+    merged = merge_overlapping_intervals(intervals)
+
+    # Assert
+    assert merged == (
+        Active(start=t1, end=t3, value=True),
+        Active(start=t3, end=t5, value=False),
+    )
+
+
+def test_merge_overlapping_intervals_chain_extends():
+    """
+    A third interval that extends past the trimmed second interval must be
+    trimmed against it and kept (not silently dropped).
+
+    ```
+            t1....t2....t3....t4....t5
+    Input:  |-----v1----|
+                  |-----v2----|
+                        |-----v3----|
+    Output: |-----v1----|--v2-|--v3-|
+    ```
+    """
+    # Arrange
+    t1 = datetime(2001, 1, 1, tzinfo=TZ)
+    t2 = datetime(2002, 1, 1, tzinfo=TZ)
+    t3 = datetime(2003, 1, 1, tzinfo=TZ)
+    t4 = datetime(2004, 1, 1, tzinfo=TZ)
+    t5 = datetime(2005, 1, 1, tzinfo=TZ)
+
+    intervals = (
+        Active(start=t1, end=t3, value=True),
+        Active(start=t2, end=t4, value=False),
+        Active(start=t3, end=t5, value=True),
+    )
+
+    # Act
+    merged = merge_overlapping_intervals(intervals)
+
+    # Assert
+    assert merged == (
+        Active(start=t1, end=t3, value=True),
+        Active(start=t3, end=t4, value=False),
+        Active(start=t4, end=t5, value=True),
+    )
+
+
+def test_merge_overlapping_intervals_unsorted_input_raises():
+    # Arrange
+    t1 = datetime(2001, 1, 1, tzinfo=TZ)
+    t2 = datetime(2002, 1, 1, tzinfo=TZ)
+    t3 = datetime(2003, 1, 1, tzinfo=TZ)
+    intervals = (
+        Active(start=t2, end=t3, value=True),
+        Active(start=t1, end=t2, value=False),
+    )
+
+    # Act + Assert
+    with pytest.raises(ValueError):
+        merge_overlapping_intervals(intervals)
+
+
 def test_timeline_can_be_instantiated_correctly():
     # Arrange
     active1 = Active(start=YESTERDAY_START, end=TODAY_START, value=True)
