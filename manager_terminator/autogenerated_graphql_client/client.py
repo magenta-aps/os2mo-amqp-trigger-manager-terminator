@@ -49,18 +49,18 @@ class GraphQLClient(AsyncBaseClient):
                 objects {
                   validities {
                     uuid
-                    org_unit {
-                      uuid
-                    }
-                    person {
-                      engagements(filter: {from_date: null, to_date: null}) {
-                        uuid
-                        org_unit {
-                          uuid
-                        }
-                        validity {
-                          from
-                          to
+                    person_response {
+                      validities {
+                        engagements_response(filter: {from_date: null, to_date: null}) {
+                          objects {
+                            validities {
+                              uuid
+                              validity {
+                                from
+                                to
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -135,11 +135,14 @@ class GraphQLClient(AsyncBaseClient):
                 objects {
                   validities {
                     uuid
-                    org_unit {
-                      uuid
-                    }
-                    person {
-                      uuid
+                    person_response {
+                      validities {
+                        uuid
+                        validity {
+                          from
+                          to
+                        }
+                      }
                     }
                     validity {
                       from

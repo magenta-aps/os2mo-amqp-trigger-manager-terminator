@@ -22,17 +22,30 @@ class GetEngagementObjectsByUuidsEngagementsObjects(BaseModel):
 
 class GetEngagementObjectsByUuidsEngagementsObjectsValidities(BaseModel):
     uuid: UUID
-    org_unit: List["GetEngagementObjectsByUuidsEngagementsObjectsValiditiesOrgUnit"]
-    person: List["GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPerson"]
+    person_response: (
+        "GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPersonResponse"
+    )
     validity: "GetEngagementObjectsByUuidsEngagementsObjectsValiditiesValidity"
 
 
-class GetEngagementObjectsByUuidsEngagementsObjectsValiditiesOrgUnit(BaseModel):
-    uuid: UUID
+class GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPersonResponse(BaseModel):
+    validities: List[
+        "GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPersonResponseValidities"
+    ]
 
 
-class GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPerson(BaseModel):
+class GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPersonResponseValidities(
+    BaseModel
+):
     uuid: UUID
+    validity: "GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPersonResponseValiditiesValidity"
+
+
+class GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPersonResponseValiditiesValidity(
+    BaseModel
+):
+    from_: Optional[datetime] = Field(alias="from")
+    to: Optional[datetime]
 
 
 class GetEngagementObjectsByUuidsEngagementsObjectsValiditiesValidity(BaseModel):
@@ -44,6 +57,7 @@ GetEngagementObjectsByUuids.update_forward_refs()
 GetEngagementObjectsByUuidsEngagements.update_forward_refs()
 GetEngagementObjectsByUuidsEngagementsObjects.update_forward_refs()
 GetEngagementObjectsByUuidsEngagementsObjectsValidities.update_forward_refs()
-GetEngagementObjectsByUuidsEngagementsObjectsValiditiesOrgUnit.update_forward_refs()
-GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPerson.update_forward_refs()
+GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPersonResponse.update_forward_refs()
+GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPersonResponseValidities.update_forward_refs()
+GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPersonResponseValiditiesValidity.update_forward_refs()
 GetEngagementObjectsByUuidsEngagementsObjectsValiditiesValidity.update_forward_refs()

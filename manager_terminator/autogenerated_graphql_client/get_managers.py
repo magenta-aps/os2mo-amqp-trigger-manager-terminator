@@ -22,30 +22,44 @@ class GetManagersManagersObjects(BaseModel):
 
 class GetManagersManagersObjectsValidities(BaseModel):
     uuid: UUID
-    org_unit: List["GetManagersManagersObjectsValiditiesOrgUnit"]
-    person: Optional[List["GetManagersManagersObjectsValiditiesPerson"]]
+    person_response: Optional["GetManagersManagersObjectsValiditiesPersonResponse"]
     validity: "GetManagersManagersObjectsValiditiesValidity"
 
 
-class GetManagersManagersObjectsValiditiesOrgUnit(BaseModel):
+class GetManagersManagersObjectsValiditiesPersonResponse(BaseModel):
+    validities: List["GetManagersManagersObjectsValiditiesPersonResponseValidities"]
+
+
+class GetManagersManagersObjectsValiditiesPersonResponseValidities(BaseModel):
+    engagements_response: "GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponse"
+
+
+class GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponse(
+    BaseModel
+):
+    objects: List[
+        "GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponseObjects"
+    ]
+
+
+class GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponseObjects(
+    BaseModel
+):
+    validities: List[
+        "GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponseObjectsValidities"
+    ]
+
+
+class GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponseObjectsValidities(
+    BaseModel
+):
     uuid: UUID
+    validity: "GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponseObjectsValiditiesValidity"
 
 
-class GetManagersManagersObjectsValiditiesPerson(BaseModel):
-    engagements: List["GetManagersManagersObjectsValiditiesPersonEngagements"]
-
-
-class GetManagersManagersObjectsValiditiesPersonEngagements(BaseModel):
-    uuid: UUID
-    org_unit: List["GetManagersManagersObjectsValiditiesPersonEngagementsOrgUnit"]
-    validity: "GetManagersManagersObjectsValiditiesPersonEngagementsValidity"
-
-
-class GetManagersManagersObjectsValiditiesPersonEngagementsOrgUnit(BaseModel):
-    uuid: UUID
-
-
-class GetManagersManagersObjectsValiditiesPersonEngagementsValidity(BaseModel):
+class GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponseObjectsValiditiesValidity(
+    BaseModel
+):
     from_: datetime = Field(alias="from")
     to: Optional[datetime]
 
@@ -59,9 +73,10 @@ GetManagers.update_forward_refs()
 GetManagersManagers.update_forward_refs()
 GetManagersManagersObjects.update_forward_refs()
 GetManagersManagersObjectsValidities.update_forward_refs()
-GetManagersManagersObjectsValiditiesOrgUnit.update_forward_refs()
-GetManagersManagersObjectsValiditiesPerson.update_forward_refs()
-GetManagersManagersObjectsValiditiesPersonEngagements.update_forward_refs()
-GetManagersManagersObjectsValiditiesPersonEngagementsOrgUnit.update_forward_refs()
-GetManagersManagersObjectsValiditiesPersonEngagementsValidity.update_forward_refs()
+GetManagersManagersObjectsValiditiesPersonResponse.update_forward_refs()
+GetManagersManagersObjectsValiditiesPersonResponseValidities.update_forward_refs()
+GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponse.update_forward_refs()
+GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponseObjects.update_forward_refs()
+GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponseObjectsValidities.update_forward_refs()
+GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponseObjectsValiditiesValidity.update_forward_refs()
 GetManagersManagersObjectsValiditiesValidity.update_forward_refs()
