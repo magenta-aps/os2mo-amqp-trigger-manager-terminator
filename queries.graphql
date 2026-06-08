@@ -6,12 +6,18 @@ query GetManagers($filter: ManagerFilter!) {
     objects {
       validities {
         uuid
-        person {
-          engagements(filter: { from_date: null, to_date: null }) {
-            uuid
-            validity {
-              from
-              to
+        person_response {
+          validities {
+            engagements_response(filter: { from_date: null, to_date: null }) {
+              objects {
+                validities {
+                  uuid
+                  validity {
+                    from
+                    to
+                  }
+                }
+              }
             }
           }
         }
@@ -59,8 +65,14 @@ query GetEngagementObjectsByUuids($engagement_uuids: [UUID!]!) {
     objects {
       validities {
         uuid
-        person {
-          uuid
+        person_response {
+          validities {
+            uuid
+            validity {
+              from
+              to
+            }
+          }
         }
         validity {
           from
