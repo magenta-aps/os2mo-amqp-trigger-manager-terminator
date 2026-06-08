@@ -6,15 +6,9 @@ query GetManagers($filter: ManagerFilter!) {
     objects {
       validities {
         uuid
-        org_unit {
-          uuid
-        }
         person {
           engagements(filter: { from_date: null, to_date: null }) {
             uuid
-            org_unit {
-              uuid
-            }
             validity {
               from
               to
@@ -65,9 +59,6 @@ query GetEngagementObjectsByUuids($engagement_uuids: [UUID!]!) {
     objects {
       validities {
         uuid
-        org_unit {
-          uuid
-        }
         person {
           uuid
         }
