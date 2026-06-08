@@ -72,17 +72,17 @@ def invalid_manager_periods(
 
     return [
         period
-        for manager in managers
-        for period in _find_invalid_periods_for_one_manager(manager)
+        for manager_obj in managers
+        for period in _find_invalid_periods_for_one_manager(manager_obj)
     ]
 
 
 def _find_invalid_periods_for_one_manager(
-    manager: GetManagersManagersObjects,
+    manager_obj: GetManagersManagersObjects,
 ) -> list[InvalidManagerPeriod]:
     invalid_manager_periods = []
-    manager_timeline = _make_manager_timeline(manager)
-    engagement_timeline = _make_engagement_timeline(manager)
+    manager_timeline = _make_manager_timeline(manager_obj)
+    engagement_timeline = _make_engagement_timeline(manager_obj)
     endpoints = sorted(
         manager_timeline.get_interval_endpoints().union(
             engagement_timeline.get_interval_endpoints()
@@ -112,19 +112,21 @@ def _find_invalid_periods_for_one_manager(
     return invalid_manager_periods
 
 
-def _make_manager_timeline(manager: GetManagersManagersObjects) -> Timeline[Manager]:
+def _make_manager_timeline(
+    manager_obj: GetManagersManagersObjects,
+) -> Timeline[Manager]:
     manager_intervals = (
         Manager(
-            start=manager_obj.validity.from_,
-            end=manager_obj.validity.to or POSITIVE_INFINITY,
+            start=manager.validity.from_,
+            end=manager.validity.to or POSITIVE_INFINITY,
             value=ManagerValue(
-                uuid=manager_obj.uuid,
+                uuid=manager.uuid,
                 status=ManagerStatus.ACTIVE
-                if manager_obj.person
+                if manager.person_response
                 else ManagerStatus.VACANT,
             ),
         )
-        for manager_obj in manager.validities
+        for manager in manager_obj.validities
     )
     manager_intervals_sorted = tuple(
         sorted(manager_intervals, key=lambda manager: manager.start)
@@ -134,7 +136,7 @@ def _make_manager_timeline(manager: GetManagersManagersObjects) -> Timeline[Mana
 
 
 def _make_engagement_timeline(
-    manager: GetManagersManagersObjects,
+    manager_obj: GetManagersManagersObjects,
 ) -> Timeline[Active]:
     engagement_intervals = (
         Active(
@@ -142,9 +144,12 @@ def _make_engagement_timeline(
             end=engagement.validity.to or POSITIVE_INFINITY,
             value=True,
         )
-        for manager_obj in manager.validities
-        for manager_employee in (manager_obj.person or [])
-        for engagement in (manager_employee.engagements or [])
+        for manager in manager_obj.validities
+        if manager.person_response
+        for manager_employee in manager.person_response.validities
+        for engagement_obj in (manager_employee.engagements_response.objects or [])
+        if engagement_obj
+        for engagement in engagement_obj.validities
     )
     engagement_intervals_sorted = tuple(
         sorted(engagement_intervals, key=lambda manager: manager.start)

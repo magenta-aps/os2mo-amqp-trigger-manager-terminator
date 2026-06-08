@@ -237,10 +237,11 @@ async def test_terminate_engagement_set_to_vacant_smoke(
             assert len(validities) == 2
 
             # assert manager person is set in [t1, t2], and null in [t2, ...)
-            assert validities[0].person is not None
-            person_1 = one(validities[0].person)
-            person_engagement = one(person_1.engagements)
+            assert validities[0].person_response is not None
+            person_1 = one(validities[0].person_response.validities)
+            person_engagement_obj = one(person_1.engagements_response.objects)
+            person_engagement = one(person_engagement_obj.validities)
             assert person_engagement.uuid == engagement_uuid
-            assert validities[1].person is None
+            assert validities[1].person_response is None
 
         await assertions()

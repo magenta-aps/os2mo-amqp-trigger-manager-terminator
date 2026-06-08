@@ -34,7 +34,7 @@ async def engagement_event_handler(
     employee_uuids = {
         employee.uuid
         for engagement in engagement_objects
-        for employee in engagement.person
+        for employee in engagement.person_response.validities
     }
 
     # Fetch all manager objects related to the engagement employee-uuids

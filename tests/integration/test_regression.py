@@ -181,13 +181,13 @@ async def test_69922_future_termination(
             assert len(validities) == 7
 
             # assert manager has person in [t1, t2] and [t3, t7]; and null in [t2, t3], [t7, ...)
-            person_1 = validities[0].person
-            person_2 = validities[1].person
-            person_3 = validities[2].person
-            person_4 = validities[3].person
-            person_5 = validities[4].person
-            person_6 = validities[5].person
-            person_7 = validities[6].person
+            person_1 = validities[0].person_response
+            person_2 = validities[1].person_response
+            person_3 = validities[2].person_response
+            person_4 = validities[3].person_response
+            person_5 = validities[4].person_response
+            person_6 = validities[5].person_response
+            person_7 = validities[6].person_response
             assert person_1 is not None
             assert person_2 is None
             assert person_3 is not None

@@ -287,9 +287,9 @@ async def test_idempotent_vacancy(
         # logic ran. The vacant validity [t1, t3] should remain untouched.
         validities = manager_obj.validities
         validity_1 = validities[0].validity
-        person_1 = validities[0].person
+        person_1 = validities[0].person_response
         validity_2 = validities[1].validity
-        person_2 = validities[1].person
+        person_2 = validities[1].person_response
         assert validity_1.from_ == t1
         assert validity_1.to == t3
         assert person_1 is None
