@@ -57,6 +57,14 @@ include:
       - gitlab-ci-templates/common/pre-commit.v1.yml
       - gitlab-ci-templates/python/pytest.v1.yml
 
+# override GIT_DEPTH
+".lint:commits":
+  variables:
+    GIT_DEPTH: 40
+".releaserc":
+  variables:
+    GIT_DEPTH: 40
+
 Test:
   variables:
     PYTEST_ADDOPTS: "-m 'not integration_test'"
