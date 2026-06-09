@@ -6,18 +6,18 @@ query GetManagers($filter: ManagerFilter!) {
     objects {
       validities {
         uuid
-        org_unit {
-          uuid
-        }
-        person {
-          engagements(filter: { from_date: null, to_date: null }) {
-            uuid
-            org_unit {
-              uuid
-            }
-            validity {
-              from
-              to
+        person_response {
+          validities {
+            engagements_response(filter: { from_date: null, to_date: null }) {
+              objects {
+                validities {
+                  uuid
+                  validity {
+                    from
+                    to
+                  }
+                }
+              }
             }
           }
         }
@@ -58,45 +58,6 @@ mutation UpdateManager(
   }
 }
 
-query GetEngagementObjects($engagement_uuid: UUID!) {
-  engagements(filter: { uuids: [$engagement_uuid] }) {
-    objects {
-      validities {
-        org_unit {
-          uuid
-        }
-        validity {
-          from
-          to
-        }
-        person {
-          uuid
-          engagements(filter: { from_date: null, to_date: null }) {
-            uuid
-            org_unit {
-              uuid
-            }
-            validity {
-              from
-              to
-            }
-          }
-          manager_roles {
-            uuid
-            org_unit {
-              uuid
-            }
-            validity {
-              from
-              to
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
 query GetEngagementObjectsByUuids($engagement_uuids: [UUID!]!) {
   engagements(
     filter: { uuids: $engagement_uuids, from_date: null, to_date: null }
@@ -104,11 +65,14 @@ query GetEngagementObjectsByUuids($engagement_uuids: [UUID!]!) {
     objects {
       validities {
         uuid
-        org_unit {
-          uuid
-        }
-        person {
-          uuid
+        person_response {
+          validities {
+            uuid
+            validity {
+              from
+              to
+            }
+          }
         }
         validity {
           from
@@ -119,106 +83,38 @@ query GetEngagementObjectsByUuids($engagement_uuids: [UUID!]!) {
   }
 }
 
-#query GetEmployeeManagers($employee_uuids: [UUID!]!) {
-#  managers(
-#    filter: { employees: $employee_uuids, from_date: null, to_date: null }
-#  ) {
-#    objects {
-#      validities {
-#        uuid
-#        org_unit {
-#          uuid
-#        }
-#        person {
-#          engagements(filter: { from_date: null, to_date: null }) {
-#            uuid
-#            org_unit {
-#              uuid
-#            }
-#            validity {
-#              from
-#              to
-#            }
-#          }
-#        }
-#        validity {
-#          from
-#          to
-#        }
-#      }
-#    }
-#  }
-#}
-
-mutation _Testing_CreateEmployee($given_name: String!, $surname: String!) {
-  employee_create(input: { given_name: $given_name, surname: $surname }) {
+mutation _Testing_CreateEmployee($input: EmployeeCreateInput!) {
+  employee_create(input: $input) {
     uuid
   }
 }
 
-mutation _Testing_CreateEngagement(
-  $from_date: DateTime!
-  $to_date: DateTime
-  $org_unit: UUID!
-  $engagement_type: UUID!
-  $job_function: UUID!
-  $person: UUID!
-) {
-  engagement_create(
-    input: {
-      validity: { from: $from_date, to: $to_date }
-      org_unit: $org_unit
-      engagement_type: $engagement_type
-      job_function: $job_function
-      person: $person
-    }
-  ) {
+mutation _Testing_CreateEngagement($input: EngagementCreateInput!) {
+  engagement_create(input: $input) {
     uuid
   }
 }
 
-mutation _Testing_CreateManager(
-  $person: UUID!
-  $responsibility: [UUID!]!
-  $org_unit: UUID!
-  $manager_level: UUID!
-  $manager_type: UUID!
-  $from_date: DateTime!
-) {
-  manager_create(
-    input: {
-      person: $person
-      responsibility: $responsibility
-      org_unit: $org_unit
-      manager_level: $manager_level
-      manager_type: $manager_type
-      validity: { from: $from_date }
-    }
-  ) {
+mutation _Testing_CreateManager($input: ManagerCreateInput!) {
+  manager_create(input: $input) {
     uuid
   }
 }
 
-mutation _Testing_CreateOrgUnit(
-  $from_date: DateTime!
-  $name: String!
-  $org_unit_type: UUID!
-  $parent: UUID
-) {
-  org_unit_create(
-    input: {
-      validity: { from: $from_date }
-      name: $name
-      org_unit_type: $org_unit_type
-      parent: $parent
-    }
-  ) {
+mutation _Testing_CreateOrgUnit($input: OrganisationUnitCreateInput!) {
+  org_unit_create(input: $input) {
     uuid
   }
 }
 
 mutation _Testing_TerminateEngagement($uuid: UUID!, $to: DateTime!) {
   engagement_terminate(input: { uuid: $uuid, to: $to }) {
+    uuid
+  }
+}
+
+mutation _Testing_UpdateManager($input: ManagerUpdateInput!) {
+  manager_update(input: $input) {
     uuid
   }
 }

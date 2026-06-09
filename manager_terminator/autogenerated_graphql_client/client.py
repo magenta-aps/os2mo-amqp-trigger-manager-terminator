@@ -16,16 +16,21 @@ from ._testing__terminate_engagement import TestingTerminateEngagement
 from ._testing__terminate_engagement import (
     TestingTerminateEngagementEngagementTerminate,
 )
+from ._testing__update_manager import TestingUpdateManager
+from ._testing__update_manager import TestingUpdateManagerManagerUpdate
 from .async_base_client import AsyncBaseClient
 from .base_model import UNSET
 from .base_model import UnsetType
-from .get_engagement_objects import GetEngagementObjects
-from .get_engagement_objects import GetEngagementObjectsEngagements
 from .get_engagement_objects_by_uuids import GetEngagementObjectsByUuids
 from .get_engagement_objects_by_uuids import GetEngagementObjectsByUuidsEngagements
 from .get_managers import GetManagers
 from .get_managers import GetManagersManagers
+from .input_types import EmployeeCreateInput
+from .input_types import EngagementCreateInput
+from .input_types import ManagerCreateInput
 from .input_types import ManagerFilter
+from .input_types import ManagerUpdateInput
+from .input_types import OrganisationUnitCreateInput
 from .terminate_manager import TerminateManager
 from .terminate_manager import TerminateManagerManagerTerminate
 from .update_manager import UpdateManager
@@ -38,25 +43,24 @@ def gql(q: str) -> str:
 
 class GraphQLClient(AsyncBaseClient):
     async def get_managers(self, filter: ManagerFilter) -> GetManagersManagers:
-        query = gql(
-            """
+        query = gql("""
             query GetManagers($filter: ManagerFilter!) {
               managers(filter: $filter) {
                 objects {
                   validities {
                     uuid
-                    org_unit {
-                      uuid
-                    }
-                    person {
-                      engagements(filter: {from_date: null, to_date: null}) {
-                        uuid
-                        org_unit {
-                          uuid
-                        }
-                        validity {
-                          from
-                          to
+                    person_response {
+                      validities {
+                        engagements_response(filter: {from_date: null, to_date: null}) {
+                          objects {
+                            validities {
+                              uuid
+                              validity {
+                                from
+                                to
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -68,8 +72,7 @@ class GraphQLClient(AsyncBaseClient):
                 }
               }
             }
-            """
-        )
+            """)
         variables: dict[str, object] = {"filter": filter}
         response = await self.execute(query=query, variables=variables)
         data = self.get_data(response)
@@ -81,8 +84,7 @@ class GraphQLClient(AsyncBaseClient):
         terminate_to: datetime,
         terminate_from: Union[Optional[datetime], UnsetType] = UNSET,
     ) -> TerminateManagerManagerTerminate:
-        query = gql(
-            """
+        query = gql("""
             mutation TerminateManager($uuid: UUID!, $terminate_from: DateTime, $terminate_to: DateTime!) {
               manager_terminate(
                 input: {uuid: $uuid, from: $terminate_from, to: $terminate_to}
@@ -90,8 +92,7 @@ class GraphQLClient(AsyncBaseClient):
                 uuid
               }
             }
-            """
-        )
+            """)
         variables: dict[str, object] = {
             "uuid": uuid,
             "terminate_from": terminate_from,
@@ -107,8 +108,7 @@ class GraphQLClient(AsyncBaseClient):
         vacant_from: datetime,
         vacant_to: Union[Optional[datetime], UnsetType] = UNSET,
     ) -> UpdateManagerManagerUpdate:
-        query = gql(
-            """
+        query = gql("""
             mutation UpdateManager($uuid: UUID!, $vacant_from: DateTime!, $vacant_to: DateTime) {
               manager_update(
                 input: {uuid: $uuid, validity: {from: $vacant_from, to: $vacant_to}, person: null}
@@ -116,8 +116,7 @@ class GraphQLClient(AsyncBaseClient):
                 uuid
               }
             }
-            """
-        )
+            """)
         variables: dict[str, object] = {
             "uuid": uuid,
             "vacant_from": vacant_from,
@@ -127,71 +126,23 @@ class GraphQLClient(AsyncBaseClient):
         data = self.get_data(response)
         return UpdateManager.parse_obj(data).manager_update
 
-    async def get_engagement_objects(
-        self, engagement_uuid: UUID
-    ) -> GetEngagementObjectsEngagements:
-        query = gql(
-            """
-            query GetEngagementObjects($engagement_uuid: UUID!) {
-              engagements(filter: {uuids: [$engagement_uuid]}) {
-                objects {
-                  validities {
-                    org_unit {
-                      uuid
-                    }
-                    validity {
-                      from
-                      to
-                    }
-                    person {
-                      uuid
-                      engagements(filter: {from_date: null, to_date: null}) {
-                        uuid
-                        org_unit {
-                          uuid
-                        }
-                        validity {
-                          from
-                          to
-                        }
-                      }
-                      manager_roles {
-                        uuid
-                        org_unit {
-                          uuid
-                        }
-                        validity {
-                          from
-                          to
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            """
-        )
-        variables: dict[str, object] = {"engagement_uuid": engagement_uuid}
-        response = await self.execute(query=query, variables=variables)
-        data = self.get_data(response)
-        return GetEngagementObjects.parse_obj(data).engagements
-
     async def get_engagement_objects_by_uuids(
         self, engagement_uuids: List[UUID]
     ) -> GetEngagementObjectsByUuidsEngagements:
-        query = gql(
-            """
+        query = gql("""
             query GetEngagementObjectsByUuids($engagement_uuids: [UUID!]!) {
               engagements(filter: {uuids: $engagement_uuids, from_date: null, to_date: null}) {
                 objects {
                   validities {
                     uuid
-                    org_unit {
-                      uuid
-                    }
-                    person {
-                      uuid
+                    person_response {
+                      validities {
+                        uuid
+                        validity {
+                          from
+                          to
+                        }
+                      }
                     }
                     validity {
                       from
@@ -201,118 +152,68 @@ class GraphQLClient(AsyncBaseClient):
                 }
               }
             }
-            """
-        )
+            """)
         variables: dict[str, object] = {"engagement_uuids": engagement_uuids}
         response = await self.execute(query=query, variables=variables)
         data = self.get_data(response)
         return GetEngagementObjectsByUuids.parse_obj(data).engagements
 
     async def _testing__create_employee(
-        self, given_name: str, surname: str
+        self, input: EmployeeCreateInput
     ) -> TestingCreateEmployeeEmployeeCreate:
-        query = gql(
-            """
-            mutation _Testing_CreateEmployee($given_name: String!, $surname: String!) {
-              employee_create(input: {given_name: $given_name, surname: $surname}) {
+        query = gql("""
+            mutation _Testing_CreateEmployee($input: EmployeeCreateInput!) {
+              employee_create(input: $input) {
                 uuid
               }
             }
-            """
-        )
-        variables: dict[str, object] = {"given_name": given_name, "surname": surname}
+            """)
+        variables: dict[str, object] = {"input": input}
         response = await self.execute(query=query, variables=variables)
         data = self.get_data(response)
         return TestingCreateEmployee.parse_obj(data).employee_create
 
     async def _testing__create_engagement(
-        self,
-        from_date: datetime,
-        org_unit: UUID,
-        engagement_type: UUID,
-        job_function: UUID,
-        person: UUID,
-        to_date: Union[Optional[datetime], UnsetType] = UNSET,
+        self, input: EngagementCreateInput
     ) -> TestingCreateEngagementEngagementCreate:
-        query = gql(
-            """
-            mutation _Testing_CreateEngagement($from_date: DateTime!, $to_date: DateTime, $org_unit: UUID!, $engagement_type: UUID!, $job_function: UUID!, $person: UUID!) {
-              engagement_create(
-                input: {validity: {from: $from_date, to: $to_date}, org_unit: $org_unit, engagement_type: $engagement_type, job_function: $job_function, person: $person}
-              ) {
+        query = gql("""
+            mutation _Testing_CreateEngagement($input: EngagementCreateInput!) {
+              engagement_create(input: $input) {
                 uuid
               }
             }
-            """
-        )
-        variables: dict[str, object] = {
-            "from_date": from_date,
-            "to_date": to_date,
-            "org_unit": org_unit,
-            "engagement_type": engagement_type,
-            "job_function": job_function,
-            "person": person,
-        }
+            """)
+        variables: dict[str, object] = {"input": input}
         response = await self.execute(query=query, variables=variables)
         data = self.get_data(response)
         return TestingCreateEngagement.parse_obj(data).engagement_create
 
     async def _testing__create_manager(
-        self,
-        person: UUID,
-        responsibility: List[UUID],
-        org_unit: UUID,
-        manager_level: UUID,
-        manager_type: UUID,
-        from_date: datetime,
+        self, input: ManagerCreateInput
     ) -> TestingCreateManagerManagerCreate:
-        query = gql(
-            """
-            mutation _Testing_CreateManager($person: UUID!, $responsibility: [UUID!]!, $org_unit: UUID!, $manager_level: UUID!, $manager_type: UUID!, $from_date: DateTime!) {
-              manager_create(
-                input: {person: $person, responsibility: $responsibility, org_unit: $org_unit, manager_level: $manager_level, manager_type: $manager_type, validity: {from: $from_date}}
-              ) {
+        query = gql("""
+            mutation _Testing_CreateManager($input: ManagerCreateInput!) {
+              manager_create(input: $input) {
                 uuid
               }
             }
-            """
-        )
-        variables: dict[str, object] = {
-            "person": person,
-            "responsibility": responsibility,
-            "org_unit": org_unit,
-            "manager_level": manager_level,
-            "manager_type": manager_type,
-            "from_date": from_date,
-        }
+            """)
+        variables: dict[str, object] = {"input": input}
         response = await self.execute(query=query, variables=variables)
         data = self.get_data(response)
         return TestingCreateManager.parse_obj(data).manager_create
 
     async def _testing__create_org_unit(
-        self,
-        from_date: datetime,
-        name: str,
-        org_unit_type: UUID,
-        parent: Union[Optional[UUID], UnsetType] = UNSET,
+        self, input: OrganisationUnitCreateInput
     ) -> TestingCreateOrgUnitOrgUnitCreate:
-        query = gql(
-            """
-            mutation _Testing_CreateOrgUnit($from_date: DateTime!, $name: String!, $org_unit_type: UUID!, $parent: UUID) {
-              org_unit_create(
-                input: {validity: {from: $from_date}, name: $name, org_unit_type: $org_unit_type, parent: $parent}
-              ) {
+        query = gql("""
+            mutation _Testing_CreateOrgUnit($input: OrganisationUnitCreateInput!) {
+              org_unit_create(input: $input) {
                 uuid
               }
             }
-            """
-        )
-        variables: dict[str, object] = {
-            "from_date": from_date,
-            "name": name,
-            "org_unit_type": org_unit_type,
-            "parent": parent,
-        }
+            """)
+        variables: dict[str, object] = {"input": input}
         response = await self.execute(query=query, variables=variables)
         data = self.get_data(response)
         return TestingCreateOrgUnit.parse_obj(data).org_unit_create
@@ -320,16 +221,29 @@ class GraphQLClient(AsyncBaseClient):
     async def _testing__terminate_engagement(
         self, uuid: UUID, to: datetime
     ) -> TestingTerminateEngagementEngagementTerminate:
-        query = gql(
-            """
+        query = gql("""
             mutation _Testing_TerminateEngagement($uuid: UUID!, $to: DateTime!) {
               engagement_terminate(input: {uuid: $uuid, to: $to}) {
                 uuid
               }
             }
-            """
-        )
+            """)
         variables: dict[str, object] = {"uuid": uuid, "to": to}
         response = await self.execute(query=query, variables=variables)
         data = self.get_data(response)
         return TestingTerminateEngagement.parse_obj(data).engagement_terminate
+
+    async def _testing__update_manager(
+        self, input: ManagerUpdateInput
+    ) -> TestingUpdateManagerManagerUpdate:
+        query = gql("""
+            mutation _Testing_UpdateManager($input: ManagerUpdateInput!) {
+              manager_update(input: $input) {
+                uuid
+              }
+            }
+            """)
+        variables: dict[str, object] = {"input": input}
+        response = await self.execute(query=query, variables=variables)
+        data = self.get_data(response)
+        return TestingUpdateManager.parse_obj(data).manager_update

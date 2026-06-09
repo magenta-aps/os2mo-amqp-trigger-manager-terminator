@@ -10,6 +10,8 @@ from ._testing__terminate_engagement import TestingTerminateEngagement
 from ._testing__terminate_engagement import (
     TestingTerminateEngagementEngagementTerminate,
 )
+from ._testing__update_manager import TestingUpdateManager
+from ._testing__update_manager import TestingUpdateManagerManagerUpdate
 from .async_base_client import AsyncBaseClient
 from .base_model import BaseModel
 from .client import GraphQLClient
@@ -22,37 +24,6 @@ from .exceptions import GraphQLClientGraphQLError
 from .exceptions import GraphQLClientGraphQLMultiError
 from .exceptions import GraphQLClientHttpError
 from .exceptions import GraphQlClientInvalidResponseError
-from .get_engagement_objects import GetEngagementObjects
-from .get_engagement_objects import GetEngagementObjectsEngagements
-from .get_engagement_objects import GetEngagementObjectsEngagementsObjects
-from .get_engagement_objects import GetEngagementObjectsEngagementsObjectsValidities
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesOrgUnit,
-)
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesPerson,
-)
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesPersonEngagements,
-)
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesPersonEngagementsOrgUnit,
-)
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesPersonEngagementsValidity,
-)
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesPersonManagerRoles,
-)
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesPersonManagerRolesOrgUnit,
-)
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesPersonManagerRolesValidity,
-)
-from .get_engagement_objects import (
-    GetEngagementObjectsEngagementsObjectsValiditiesValidity,
-)
 from .get_engagement_objects_by_uuids import GetEngagementObjectsByUuids
 from .get_engagement_objects_by_uuids import GetEngagementObjectsByUuidsEngagements
 from .get_engagement_objects_by_uuids import (
@@ -62,10 +33,13 @@ from .get_engagement_objects_by_uuids import (
     GetEngagementObjectsByUuidsEngagementsObjectsValidities,
 )
 from .get_engagement_objects_by_uuids import (
-    GetEngagementObjectsByUuidsEngagementsObjectsValiditiesOrgUnit,
+    GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPersonResponse,
 )
 from .get_engagement_objects_by_uuids import (
-    GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPerson,
+    GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPersonResponseValidities,
+)
+from .get_engagement_objects_by_uuids import (
+    GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPersonResponseValiditiesValidity,
 )
 from .get_engagement_objects_by_uuids import (
     GetEngagementObjectsByUuidsEngagementsObjectsValiditiesValidity,
@@ -74,11 +48,20 @@ from .get_managers import GetManagers
 from .get_managers import GetManagersManagers
 from .get_managers import GetManagersManagersObjects
 from .get_managers import GetManagersManagersObjectsValidities
-from .get_managers import GetManagersManagersObjectsValiditiesOrgUnit
-from .get_managers import GetManagersManagersObjectsValiditiesPerson
-from .get_managers import GetManagersManagersObjectsValiditiesPersonEngagements
-from .get_managers import GetManagersManagersObjectsValiditiesPersonEngagementsOrgUnit
-from .get_managers import GetManagersManagersObjectsValiditiesPersonEngagementsValidity
+from .get_managers import GetManagersManagersObjectsValiditiesPersonResponse
+from .get_managers import GetManagersManagersObjectsValiditiesPersonResponseValidities
+from .get_managers import (
+    GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponse,
+)
+from .get_managers import (
+    GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponseObjects,
+)
+from .get_managers import (
+    GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponseObjectsValidities,
+)
+from .get_managers import (
+    GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponseObjectsValiditiesValidity,
+)
 from .get_managers import GetManagersManagersObjectsValiditiesValidity
 from .input_types import AccessLogFilter
 from .input_types import AddressCreateInput
@@ -271,35 +254,24 @@ __all__ = [
     "FileFilter",
     "FileStore",
     "FullEventFilter",
-    "GetEngagementObjects",
     "GetEngagementObjectsByUuids",
     "GetEngagementObjectsByUuidsEngagements",
     "GetEngagementObjectsByUuidsEngagementsObjects",
     "GetEngagementObjectsByUuidsEngagementsObjectsValidities",
-    "GetEngagementObjectsByUuidsEngagementsObjectsValiditiesOrgUnit",
-    "GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPerson",
+    "GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPersonResponse",
+    "GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPersonResponseValidities",
+    "GetEngagementObjectsByUuidsEngagementsObjectsValiditiesPersonResponseValiditiesValidity",
     "GetEngagementObjectsByUuidsEngagementsObjectsValiditiesValidity",
-    "GetEngagementObjectsEngagements",
-    "GetEngagementObjectsEngagementsObjects",
-    "GetEngagementObjectsEngagementsObjectsValidities",
-    "GetEngagementObjectsEngagementsObjectsValiditiesOrgUnit",
-    "GetEngagementObjectsEngagementsObjectsValiditiesPerson",
-    "GetEngagementObjectsEngagementsObjectsValiditiesPersonEngagements",
-    "GetEngagementObjectsEngagementsObjectsValiditiesPersonEngagementsOrgUnit",
-    "GetEngagementObjectsEngagementsObjectsValiditiesPersonEngagementsValidity",
-    "GetEngagementObjectsEngagementsObjectsValiditiesPersonManagerRoles",
-    "GetEngagementObjectsEngagementsObjectsValiditiesPersonManagerRolesOrgUnit",
-    "GetEngagementObjectsEngagementsObjectsValiditiesPersonManagerRolesValidity",
-    "GetEngagementObjectsEngagementsObjectsValiditiesValidity",
     "GetManagers",
     "GetManagersManagers",
     "GetManagersManagersObjects",
     "GetManagersManagersObjectsValidities",
-    "GetManagersManagersObjectsValiditiesOrgUnit",
-    "GetManagersManagersObjectsValiditiesPerson",
-    "GetManagersManagersObjectsValiditiesPersonEngagements",
-    "GetManagersManagersObjectsValiditiesPersonEngagementsOrgUnit",
-    "GetManagersManagersObjectsValiditiesPersonEngagementsValidity",
+    "GetManagersManagersObjectsValiditiesPersonResponse",
+    "GetManagersManagersObjectsValiditiesPersonResponseValidities",
+    "GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponse",
+    "GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponseObjects",
+    "GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponseObjectsValidities",
+    "GetManagersManagersObjectsValiditiesPersonResponseValiditiesEngagementsResponseObjectsValiditiesValidity",
     "GetManagersManagersObjectsValiditiesValidity",
     "GraphQLClient",
     "GraphQLClientError",
@@ -395,6 +367,8 @@ __all__ = [
     "TestingCreateOrgUnitOrgUnitCreate",
     "TestingTerminateEngagement",
     "TestingTerminateEngagementEngagementTerminate",
+    "TestingUpdateManager",
+    "TestingUpdateManagerManagerUpdate",
     "UpdateManager",
     "UpdateManagerManagerUpdate",
     "UuidsBoundClassFilter",

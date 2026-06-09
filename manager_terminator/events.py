@@ -26,7 +26,7 @@ async def engagement_event_handler(
 ):
     # Get all engagement objects related to the engagement-event
     engagement_objects = await engagements.get_by_uuid(mo, engagement_uuid)
-    if len(engagement_objects) < 1:
+    if len(engagement_objects) < 1:  # pragma: no cover
         logger.error("No engagement objects found for", engagement_uuid=engagement_uuid)
         return
 
@@ -34,23 +34,21 @@ async def engagement_event_handler(
     employee_uuids = {
         employee.uuid
         for engagement in engagement_objects
-        for employee in engagement.person
+        for employee in engagement.person_response.validities
     }
 
     # Fetch all manager objects related to the engagement employee-uuids
     employee_manager_objects = await managers.get_by_employee_uuids(
         mo, list(employee_uuids)
     )
-    if len(employee_manager_objects) < 1:
+    if len(employee_manager_objects) < 1:  # pragma: no cover
         logger.error(
             "No manager objects found for employees", employee_uuids=employee_uuids
         )
         return
 
     # Find invalid manager periods
-    manager_invalid_periods = await managers.invalid_manager_periods(
-        employee_manager_objects
-    )
+    manager_invalid_periods = managers.invalid_manager_periods(employee_manager_objects)
     if len(manager_invalid_periods) < 1:
         logger.info("No invalid manager periods found.")
         return

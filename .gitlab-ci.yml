@@ -15,7 +15,8 @@ variables:
   RELEASE_REGISTRY_IMAGE: index.docker.io/magentaaps/os2mo-amqp-trigger-manager-terminator
 
   PYTEST_COV_MODULE: manager_terminator
-  PYTEST_COV_FAIL_UNDER: 60
+  # only 100% or 0% make sense
+  PYTEST_COV_FAIL_UNDER: 100
 
   PRECOMMIT_USE_POETRY: "true"
   POETRY_VERSION: "1.5.1"
@@ -55,6 +56,14 @@ include:
       - gitlab-ci-templates/common/docker-release.v1.yml
       - gitlab-ci-templates/common/pre-commit.v1.yml
       - gitlab-ci-templates/python/pytest.v1.yml
+
+# override GIT_DEPTH
+".lint:commits":
+  variables:
+    GIT_DEPTH: 40
+".releaserc":
+  variables:
+    GIT_DEPTH: 40
 
 Test:
   variables:
