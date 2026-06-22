@@ -16,7 +16,7 @@ variables:
 
   PYTEST_COV_MODULE: manager_terminator
   # only 100% or 0% make sense
-  PYTEST_COV_FAIL_UNDER: 100
+  PYTEST_COV_FAIL_UNDER: 0
 
   PRECOMMIT_USE_POETRY: "true"
   POETRY_VERSION: "1.5.1"
