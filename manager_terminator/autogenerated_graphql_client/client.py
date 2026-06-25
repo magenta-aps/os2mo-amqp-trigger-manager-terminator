@@ -27,10 +27,12 @@ from .get_managers import GetManagers
 from .get_managers import GetManagersManagers
 from .input_types import EmployeeCreateInput
 from .input_types import EngagementCreateInput
+from .input_types import EventSendInput
 from .input_types import ManagerCreateInput
 from .input_types import ManagerFilter
 from .input_types import ManagerUpdateInput
 from .input_types import OrganisationUnitCreateInput
+from .send_event import SendEvent
 from .terminate_manager import TerminateManager
 from .terminate_manager import TerminateManagerManagerTerminate
 from .update_manager import UpdateManager
@@ -157,6 +159,17 @@ class GraphQLClient(AsyncBaseClient):
         response = await self.execute(query=query, variables=variables)
         data = self.get_data(response)
         return GetEngagementObjectsByUuids.parse_obj(data).engagements
+
+    async def send_event(self, input: EventSendInput) -> bool:
+        query = gql("""
+            mutation SendEvent($input: EventSendInput!) {
+              event_send(input: $input)
+            }
+            """)
+        variables: dict[str, object] = {"input": input}
+        response = await self.execute(query=query, variables=variables)
+        data = self.get_data(response)
+        return SendEvent.parse_obj(data).event_send
 
     async def _testing__create_employee(
         self, input: EmployeeCreateInput

@@ -195,6 +195,7 @@ from .input_types import UuidsBoundITUserFilter
 from .input_types import UuidsBoundLeaveFilter
 from .input_types import UuidsBoundOrganisationUnitFilter
 from .input_types import ValidityInput
+from .send_event import SendEvent
 from .terminate_manager import TerminateManager
 from .terminate_manager import TerminateManagerManagerTerminate
 from .update_manager import UpdateManager
@@ -355,6 +356,7 @@ __all__ = [
     "RoleBindingTerminateInput",
     "RoleBindingUpdateInput",
     "RoleRegistrationFilter",
+    "SendEvent",
     "TerminateManager",
     "TerminateManagerManagerTerminate",
     "TestingCreateEmployee",
