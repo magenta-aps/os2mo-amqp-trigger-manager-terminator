@@ -114,38 +114,17 @@ async def _engagement_event(
         )
         return
 
-    # Find invalid manager periods
-    manager_invalid_periods = managers.invalid_manager_periods(employee_manager_objects)
-    if len(manager_invalid_periods) < 1:
-        logger.info("No invalid manager periods found.")
-        return
-
-    logger.info(
-        "Found invalid manager periods:",
-        manager_invalid_periods=json.dumps(jsonable_encoder(manager_invalid_periods)),
-    )
-
-    # Terminate invalid manager periods
-    if settings.manager_terminator.set_to_vacant:
-        updated_invalid_manager_periods = await managers.update_manager_to_vacant(
-            gql_client, manager_invalid_periods
-        )
-
-        logger.info(
-            "Updated invalid periods for manager(s) to vacant:",
-            updated_invalid_manager_periods=json.dumps(
-                jsonable_encoder(updated_invalid_manager_periods)
-            ),
-        )
-
-    else:
-        terminated_invalid_manager_periods = await managers.terminate_manager_periods(
-            gql_client, manager_invalid_periods
-        )
-
-        logger.info(
-            "Terminated invalid periods for manager(s):",
-            terminated_invalid_manager_periods=json.dumps(
-                jsonable_encoder(terminated_invalid_manager_periods)
-            ),
-        )
+    for manager_obj in employee_manager_objects:
+        for manager_validity in manager_obj.validities:
+            subject = str(manager_validity.uuid)
+            await gql_client.send_event(
+                EventSendInput(
+                    namespace="manager-terminator",
+                    routing_key="manager",
+                    subject=subject,
+                )
+            )
+            logger.info(
+                "Forwarded employee manager event",
+                subject=subject,
+            )
