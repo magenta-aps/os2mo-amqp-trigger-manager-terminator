@@ -12,20 +12,21 @@ from manager_terminator import depends
 from manager_terminator import engagements
 from manager_terminator import managers
 
-from .depends import Settings
-
 logger = structlog.stdlib.get_logger()
 
 events_router = APIRouter()
 
 
-async def engagement_event_handler(
-    mo: depends.GraphQLClient,
-    engagement_uuid: UUID,
-    settings: Settings,
-):
+@events_router.post("/events/engagement")
+async def engagement_event(
+    gql_client: depends.GraphQLClient, settings: depends.Settings, event: Event[UUID]
+) -> None:
+    logger.info("Received engagement event", engagement_event=event.dict())
+
+    engagement_uuid = event.subject
+
     # Get all engagement objects related to the engagement-event
-    engagement_objects = await engagements.get_by_uuid(mo, engagement_uuid)
+    engagement_objects = await engagements.get_by_uuid(gql_client, engagement_uuid)
     if len(engagement_objects) < 1:  # pragma: no cover
         logger.error("No engagement objects found for", engagement_uuid=engagement_uuid)
         return
@@ -39,7 +40,7 @@ async def engagement_event_handler(
 
     # Fetch all manager objects related to the engagement employee-uuids
     employee_manager_objects = await managers.get_by_employee_uuids(
-        mo, list(employee_uuids)
+        gql_client, list(employee_uuids)
     )
     if len(employee_manager_objects) < 1:  # pragma: no cover
         logger.error(
@@ -57,10 +58,11 @@ async def engagement_event_handler(
         "Found invalid manager periods:",
         manager_invalid_periods=json.dumps(jsonable_encoder(manager_invalid_periods)),
     )
+
     # Terminate invalid manager periods
     if settings.manager_terminator.set_to_vacant:
         updated_invalid_manager_periods = await managers.update_manager_to_vacant(
-            mo, manager_invalid_periods
+            gql_client, manager_invalid_periods
         )
 
         logger.info(
@@ -69,9 +71,10 @@ async def engagement_event_handler(
                 jsonable_encoder(updated_invalid_manager_periods)
             ),
         )
+
     else:
         terminated_invalid_manager_periods = await managers.terminate_manager_periods(
-            mo, manager_invalid_periods
+            gql_client, manager_invalid_periods
         )
 
         logger.info(
@@ -80,12 +83,3 @@ async def engagement_event_handler(
                 jsonable_encoder(terminated_invalid_manager_periods)
             ),
         )
-
-
-@events_router.post("/events/engagement")
-async def engagement_event(
-    gql_client: depends.GraphQLClient, settings: depends.Settings, event: Event[UUID]
-) -> None:
-    logger.info("Received engagement event", engagement_event=event.dict())
-
-    await engagement_event_handler(gql_client, event.subject, settings)
