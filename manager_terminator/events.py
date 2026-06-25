@@ -64,8 +64,10 @@ async def engagement_event_handler(
         )
 
         logger.info(
-            "Updated invalid periods for manager(s) to vacant: %s"
-            % json.dumps(jsonable_encoder(updated_invalid_manager_periods))
+            "Updated invalid periods for manager(s) to vacant:",
+            updated_invalid_manager_periods=json.dumps(
+                jsonable_encoder(updated_invalid_manager_periods)
+            ),
         )
     else:
         terminated_invalid_manager_periods = await managers.terminate_manager_periods(
@@ -73,8 +75,10 @@ async def engagement_event_handler(
         )
 
         logger.info(
-            "Terminated invalid periods for manager(s): %s"
-            % json.dumps(jsonable_encoder(terminated_invalid_manager_periods))
+            "Terminated invalid periods for manager(s):",
+            terminated_invalid_manager_periods=json.dumps(
+                jsonable_encoder(terminated_invalid_manager_periods)
+            ),
         )
 
 

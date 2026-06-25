@@ -199,8 +199,8 @@ async def terminate_manager_periods(
             )
         except Exception as e:  # pragma: no cover
             logger.error(
-                "Failed to terminate invalid manager period: %s"
-                % json.dumps(jsonable_encoder(period))
+                "Failed to terminate invalid manager period:",
+                period=json.dumps(jsonable_encoder(period)),
             )
             raise e
 
@@ -226,8 +226,8 @@ async def update_manager_to_vacant(
             updated_manager_periods.append(await mo.update_manager(**update_args))
         except Exception as e:  # pragma: no cover
             logger.error(
-                "Failed to update invalid manager period to vacant: %s"
-                % json.dumps(jsonable_encoder(period))
+                "Failed to update invalid manager period to vacant:",
+                period=json.dumps(jsonable_encoder(period)),
             )
             raise e
 
