@@ -18,7 +18,7 @@ events_router = APIRouter()
 
 
 @events_router.post("/events/engagement")
-async def engagement_event(
+async def _engagement_event(
     gql_client: depends.GraphQLClient, settings: depends.Settings, event: Event[UUID]
 ) -> None:
     logger.info("Received engagement event", engagement_event=event.dict())
