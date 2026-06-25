@@ -83,6 +83,10 @@ query GetEngagementObjectsByUuids($engagement_uuids: [UUID!]!) {
   }
 }
 
+mutation SendEvent($input: EventSendInput!) {
+  event_send(input: $input)
+}
+
 mutation _Testing_CreateEmployee($input: EmployeeCreateInput!) {
   employee_create(input: $input) {
     uuid
