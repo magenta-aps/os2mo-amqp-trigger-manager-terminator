@@ -17,21 +17,24 @@ logger = structlog.get_logger(__name__)
 
 def create_app() -> FastAPI:
     settings = Settings()
+
+    listeners = []
+    if settings.listen_to_changes_in_mo:
+        listeners = [
+            Listener(
+                namespace="mo",
+                user_key="engagement",
+                routing_key="engagement",
+                path="/events/engagement",
+            )
+        ]
+
     fastramqpi = FastRAMQPI(
         application_name="os2mo-manager-terminator",
         settings=settings.fastramqpi,
         graphql_version=29,
         graphql_client_cls=GraphQLClient,
-        graphql_events=GraphQLEvents(
-            declare_listeners=[
-                Listener(
-                    namespace="mo",
-                    user_key="engagement",
-                    routing_key="engagement",
-                    path="/events/engagement",
-                )
-            ]
-        ),
+        graphql_events=GraphQLEvents(declare_listeners=listeners),
     )
 
     fastramqpi.add_context(settings=settings)
