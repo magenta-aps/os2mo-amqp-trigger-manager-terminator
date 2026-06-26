@@ -35,14 +35,16 @@ def create_app() -> FastAPI:
                 routing_key="manager",
                 path="/events/mo/manager",
             ),
-            # listeners for internal events
-            Listener(
-                namespace="manager-terminator",
-                user_key="manager",
-                routing_key="manager",
-                path="/events/manager-terminator/manager",
-            ),
         ]
+    listeners.append(
+        # listener for internal events
+        Listener(
+            namespace="manager-terminator",
+            user_key="manager",
+            routing_key="manager",
+            path="/events/manager-terminator/manager",
+        )
+    )
 
     fastramqpi = FastRAMQPI(
         application_name="os2mo-manager-terminator",
