@@ -24,6 +24,9 @@ from .exceptions import GraphQLClientGraphQLError
 from .exceptions import GraphQLClientGraphQLMultiError
 from .exceptions import GraphQLClientHttpError
 from .exceptions import GraphQlClientInvalidResponseError
+from .get_actor import GetActor
+from .get_actor import GetActorMe
+from .get_actor import GetActorMeActor
 from .get_engagement_objects_by_uuids import GetEngagementObjectsByUuids
 from .get_engagement_objects_by_uuids import GetEngagementObjectsByUuidsEngagements
 from .get_engagement_objects_by_uuids import (
@@ -195,6 +198,9 @@ from .input_types import UuidsBoundITUserFilter
 from .input_types import UuidsBoundLeaveFilter
 from .input_types import UuidsBoundOrganisationUnitFilter
 from .input_types import ValidityInput
+from .refresh_manager import RefreshManager
+from .refresh_manager import RefreshManagerManagerRefresh
+from .refresh_manager import RefreshManagerManagerRefreshPageInfo
 from .send_event import SendEvent
 from .terminate_manager import TerminateManager
 from .terminate_manager import TerminateManagerManagerTerminate
@@ -255,6 +261,9 @@ __all__ = [
     "FileFilter",
     "FileStore",
     "FullEventFilter",
+    "GetActor",
+    "GetActorMe",
+    "GetActorMeActor",
     "GetEngagementObjectsByUuids",
     "GetEngagementObjectsByUuidsEngagements",
     "GetEngagementObjectsByUuidsEngagementsObjects",
@@ -348,6 +357,9 @@ __all__ = [
     "ParentsBoundFacetFilter",
     "RAOpenValidityInput",
     "RAValidityInput",
+    "RefreshManager",
+    "RefreshManagerManagerRefresh",
+    "RefreshManagerManagerRefreshPageInfo",
     "RegistrationFilter",
     "RelatedUnitFilter",
     "RelatedUnitsUpdateInput",
