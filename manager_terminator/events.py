@@ -83,7 +83,7 @@ async def _manager_event_internal(
         )
 
 
-@events_router.post("/events/engagement")
+@events_router.post("/events/mo/engagement")
 async def _engagement_event(
     gql_client: depends.GraphQLClient, settings: depends.Settings, event: Event[UUID]
 ) -> None:

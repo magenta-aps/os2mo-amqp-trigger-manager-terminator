@@ -27,7 +27,7 @@ def create_app() -> FastAPI:
                 namespace="mo",
                 user_key="engagement",
                 routing_key="engagement",
-                path="/events/engagement",
+                path="/events/mo/engagement",
             ),
             Listener(
                 namespace="mo",
