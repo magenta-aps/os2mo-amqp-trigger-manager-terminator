@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 from typing import List
 from typing import Optional
 from typing import Union
@@ -21,6 +22,8 @@ from ._testing__update_manager import TestingUpdateManagerManagerUpdate
 from .async_base_client import AsyncBaseClient
 from .base_model import UNSET
 from .base_model import UnsetType
+from .get_actor import GetActor
+from .get_actor import GetActorMe
 from .get_engagement_objects_by_uuids import GetEngagementObjectsByUuids
 from .get_engagement_objects_by_uuids import GetEngagementObjectsByUuidsEngagements
 from .get_managers import GetManagers
@@ -32,6 +35,8 @@ from .input_types import ManagerCreateInput
 from .input_types import ManagerFilter
 from .input_types import ManagerUpdateInput
 from .input_types import OrganisationUnitCreateInput
+from .refresh_manager import RefreshManager
+from .refresh_manager import RefreshManagerManagerRefresh
 from .send_event import SendEvent
 from .terminate_manager import TerminateManager
 from .terminate_manager import TerminateManagerManagerTerminate
@@ -170,6 +175,48 @@ class GraphQLClient(AsyncBaseClient):
         response = await self.execute(query=query, variables=variables)
         data = self.get_data(response)
         return SendEvent.parse_obj(data).event_send
+
+    async def get_actor(self) -> GetActorMe:
+        query = gql("""
+            query GetActor {
+              me {
+                actor {
+                  uuid
+                }
+              }
+            }
+            """)
+        variables: dict[str, object] = {}
+        response = await self.execute(query=query, variables=variables)
+        data = self.get_data(response)
+        return GetActor.parse_obj(data).me
+
+    async def refresh_manager(
+        self,
+        owner: UUID,
+        filter: ManagerFilter,
+        cursor: Union[Optional[Any], UnsetType] = UNSET,
+        limit: Union[Optional[Any], UnsetType] = UNSET,
+    ) -> RefreshManagerManagerRefresh:
+        query = gql("""
+            mutation RefreshManager($owner: UUID!, $filter: ManagerFilter!, $cursor: Cursor, $limit: int) {
+              manager_refresh(owner: $owner, filter: $filter, cursor: $cursor, limit: $limit) {
+                objects
+                page_info {
+                  next_cursor
+                }
+              }
+            }
+            """)
+        variables: dict[str, object] = {
+            "owner": owner,
+            "filter": filter,
+            "cursor": cursor,
+            "limit": limit,
+        }
+        response = await self.execute(query=query, variables=variables)
+        data = self.get_data(response)
+        return RefreshManager.parse_obj(data).manager_refresh
 
     async def _testing__create_employee(
         self, input: EmployeeCreateInput

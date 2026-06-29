@@ -87,6 +87,33 @@ mutation SendEvent($input: EventSendInput!) {
   event_send(input: $input)
 }
 
+query GetActor {
+  me {
+    actor {
+      uuid
+    }
+  }
+}
+
+mutation RefreshManager(
+  $owner: UUID!
+  $filter: ManagerFilter!
+  $cursor: Cursor
+  $limit: int
+) {
+  manager_refresh(
+    owner: $owner
+    filter: $filter
+    cursor: $cursor
+    limit: $limit
+  ) {
+    objects
+    page_info {
+      next_cursor
+    }
+  }
+}
+
 mutation _Testing_CreateEmployee($input: EmployeeCreateInput!) {
   employee_create(input: $input) {
     uuid
